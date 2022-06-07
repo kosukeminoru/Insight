@@ -1,5 +1,5 @@
 import this
-import leveldb
+import plyvel
 import hashlib
 import pickle
 
@@ -7,26 +7,26 @@ import pickle
 def dbPut(a, b):
     # a key
     # b value
-    db = leveldb.LevelDB('./db')
+    db = plyvel.DB('./db')
     a = pickle.dumps(a)
     b = pickle.dumps(b)
-    db.Put(a, b)
+    db.put(a, b)
     return
 
 
 def dbGet(a):
     try:
-        db = leveldb.LevelDB('./db')
+        db = plyvel.DB('./db')
         a = pickle.dumps(a)
-        return pickle.loads(db.Get(a))
+        return pickle.loads(db.get(a))
     except KeyError:
         return("")
 
 
 def dbDelete(a):
-    db = leveldb.LevelDB('./db')
+    db = plyvel.DB('./db')
     a = pickle.dumps(a)
-    db.Delete(a)
+    db.delete(a)
     return
 
 
@@ -35,5 +35,3 @@ dict = {
     "difficulty": 5,
     "prev": "",
 }
-
-dbPut(1, dict)

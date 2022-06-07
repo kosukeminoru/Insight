@@ -1,1 +1,1 @@
-leveldb==0.201
+plyvel-wheels==1.3.0

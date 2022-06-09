@@ -7,7 +7,7 @@ import pickle
 def dbPut(a, b):
     # a key
     # b value
-    db = plyvel.DB('./db')
+    db = plyvel.DB('./db', create_if_missing = True)
     a = pickle.dumps(a)
     b = pickle.dumps(b)
     db.put(a, b)
@@ -16,7 +16,7 @@ def dbPut(a, b):
 
 def dbGet(a):
     try:
-        db = plyvel.DB('./db')
+        db = plyvel.DB('./db', create_if_missing = True)
         a = pickle.dumps(a)
         return pickle.loads(db.get(a))
     except KeyError:
@@ -24,7 +24,7 @@ def dbGet(a):
 
 
 def dbDelete(a):
-    db = plyvel.DB('./db')
+    db = plyvel.DB('./db', create_if_missing = True)
     a = pickle.dumps(a)
     db.delete(a)
     return
@@ -35,3 +35,5 @@ dict = {
     "difficulty": 5,
     "prev": "",
 }
+
+dbPut(1,dict)

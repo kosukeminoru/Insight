@@ -1,0 +1,11 @@
+/Users/judeal/Desktop/launch/target/debug/deps/gilrs_core-5c305861b540d291.rmeta: /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/lib.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/mod.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/mod.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/ff.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/gamepad.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/io_kit.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/utils.rs
+
+/Users/judeal/Desktop/launch/target/debug/deps/gilrs_core-5c305861b540d291.d: /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/lib.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/mod.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/mod.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/ff.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/gamepad.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/io_kit.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/utils.rs
+
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/lib.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/mod.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/mod.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/ff.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/gamepad.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/platform/macos/io_kit.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/gilrs-core-0.3.2/src/utils.rs:

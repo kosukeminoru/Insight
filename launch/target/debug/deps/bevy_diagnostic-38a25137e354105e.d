@@ -1,0 +1,9 @@
+/Users/judeal/Desktop/rust/launch/target/debug/deps/bevy_diagnostic-38a25137e354105e.rmeta: /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/lib.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/diagnostic.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/entity_count_diagnostics_plugin.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/frame_time_diagnostics_plugin.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/log_diagnostics_plugin.rs
+
+/Users/judeal/Desktop/rust/launch/target/debug/deps/bevy_diagnostic-38a25137e354105e.d: /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/lib.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/diagnostic.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/entity_count_diagnostics_plugin.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/frame_time_diagnostics_plugin.rs /Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/log_diagnostics_plugin.rs
+
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/lib.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/diagnostic.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/entity_count_diagnostics_plugin.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/frame_time_diagnostics_plugin.rs:
+/Users/judeal/.cargo/registry/src/github.com-1ecc6299db9ec823/bevy_diagnostic-0.7.0/src/log_diagnostics_plugin.rs:

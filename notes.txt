@@ -1,0 +1,19 @@
+When Putting Struct/enum into database 
+
+Serialize Struct 
+- 
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug)]
+
+let myStruct: SomeStruct = ...
+serialized = serde_json::to_string(&myStruct).unwrap();
+db::db::put(String::from(""), serialized);
+
+Deserialize Struct 
+- let new: MouseResource = serde_json::from_str(&db::db::get(String::from(""))).unwrap();
+
+
+
+Goals - 
+Up and running cryptocurrency app on mac and windows game fine for now.

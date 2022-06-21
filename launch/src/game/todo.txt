@@ -1,0 +1,13 @@
+- xaya 
+- Run in parralel where other code in main can be executed
+
+- Core Game Mechanics
+- Sprite Sheet for characters + Story
+- Collision handling improve
+- Level Generation
+- Limit on where player can spawn?
+
+
+- Set dt and substeps to optimize
+
+- Multiple Games

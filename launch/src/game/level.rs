@@ -3,10 +3,11 @@ use crate::game::constants::WY as WY;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 
-//Vector of enums of objects
+//Vector of objects which is an enum for different objects 
 pub struct Level {
     pub objects: Vec<Object>
 }
+//Default level
 impl Default for Level {
     fn default() -> Level {
         Level {
@@ -23,20 +24,21 @@ impl Default for Level {
     }
 }
 
-//Circle or Rect or ground
+//Types of objects in a level
 pub enum Object {
     Circle(Circle),
     Rectangle(Rectangle),
     Segment(Segment),
 }
 
-//Circle Struct
+//Circle Object
 pub struct Circle {
     pub x_coor: f32,
     pub y_coor: f32,
     pub radius: f32,
     pub kind: String,
 }
+// probably a better way of doing this rip
 impl Circle {
     fn new(x: f32, y: f32, r: f32, k: String) -> Circle {
         Circle {
@@ -82,20 +84,35 @@ impl Segment {
     }
 }
 
-pub fn setup_physics(mut commands: Commands) {
+pub fn setup_level(mut commands: Commands) {
     let new_level = Level {..Default::default()};
     //iterates through level struct
     for i in new_level.objects{
         //if object is circle spawn circle with dimensions
+        //insert a velocity and active event so it can be queried later
         if let Object::Circle(ccl) = i {
             commands
             .spawn()
             .insert(RigidBody::Dynamic)
             .insert(Collider::ball(ccl.radius))
-            .insert(Restitution::coefficient(0.7))
+            .insert_bundle(SpriteBundle {
+                sprite: Sprite {
+                color: Color::rgb(1.0, 0.25, 0.75),
+                custom_size: Some(Vec2::new(ccl.radius*2.0, ccl.radius*2.0)),
+                ..default()
+                },
+                transform: Transform{
+                    ..Default::default()
+                },
+                ..default()
+            })
+            .insert(ActiveEvents::COLLISION_EVENTS)
+            .insert(Restitution::coefficient(0.5))
+            .insert(Velocity{..default()})
             .insert_bundle(TransformBundle::from(Transform::from_xyz(ccl.x_coor, ccl.y_coor, 0.0)));
         }
         //if object is rectangle spawn rect with dimensions
+        //insert a velocity and active event so it can be queried later
         else if let Object::Rectangle(rct) = i {
             commands
             .spawn()
@@ -105,14 +122,31 @@ pub fn setup_physics(mut commands: Commands) {
             // | . | Dot is midpoint 1.5 dashes = width, 1.5 | = height
             // |---|
             .insert(Collider::cuboid(rct.width, rct.height))
+            .insert_bundle(SpriteBundle {
+                sprite: Sprite {
+                color: Color::rgb(0.5, 0.5, 0.5),
+                custom_size: Some(Vec2::new(2.0*rct.width, 2.0*rct.height)),
+                ..default()
+                },
+                transform: Transform{
+                    ..Default::default()
+                },
+                ..default()
+            })
             .insert(Restitution::coefficient(0.7))
+            .insert(ActiveEvents::COLLISION_EVENTS)
+            .insert(Velocity{..default()})
             .insert_bundle(TransformBundle::from(Transform::from_xyz(rct.x_coor, rct.y_coor, 0.0)));
         }
-        //if object is Segment spawn segment with dimensions
+        //if object is Segment spawn segment with dimensions 
+        //insert a velocity and active event so it can be queried later
         else if let Object::Segment(sg) = i {
             commands
             .spawn()
+            .insert(ActiveEvents::COLLISION_EVENTS)
+            .insert(Velocity{..default()})
             .insert(Collider::segment(sg.p1, sg.p2));
+
         }
     }
 }

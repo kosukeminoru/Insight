@@ -2,26 +2,23 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use crate::game::constants::WX as WX;
 use crate::game::constants::WY as WY;
-//use crate::game::constants as cnst;
-//use crate::game::level as level;
 
 //configuration of physics simulator
+//Adjust dt and substeps by same factor to retain determinism
 pub fn rap_conf() -> RapierConfiguration {
     bevy_rapier2d::plugin::RapierConfiguration {
     gravity: Vect::Y * -9.81 * 10.0,
     physics_pipeline_active: true,
     query_pipeline_active: true,
     timestep_mode: TimestepMode::Fixed {
-        dt: 0.01,
-        substeps: 1,
+        dt: 0.1,
+        substeps: 10,
     },
     scaled_shape_subdivision: 10,
-//Ball altitude: 89.78951
-//Ball altitude: -10.104906
     }
 }
 
-//configuration of pop-up window
+//configuration of simulation pop-up window
 pub fn window_conf() -> WindowDescriptor {
     bevy::window::WindowDescriptor{
         width: WX,
@@ -33,18 +30,21 @@ pub fn window_conf() -> WindowDescriptor {
     }
 }
 
-//Graphics
-pub fn setup_graphics(mut commands: Commands) {
-    // Add a camera so we can see the debug-render.
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-   /*commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite {
-            color: Color::rgb(0.25, 0.25, 0.75),
-            custom_size: Some(Vec2::new(50.0, 50.0)),
-            ..default()
-        },
-        ..default()
-    });*/
+//validation window configuration
+pub fn val_window_conf() -> WindowDescriptor {
+    bevy::window::WindowDescriptor{
+        width: 0.0,
+        height: 0.0,
+        title: "game".to_string(),
+        resizable: false,
+        
+        ..Default::default()
+    }
 }
 
-//Placing rigid bodies within the world
+//Graphics
+pub fn setup_graphics(mut commands: Commands) {
+    // Add a camera so we can see
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+}
+

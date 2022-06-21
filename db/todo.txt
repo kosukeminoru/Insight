@@ -1,7 +1,0 @@
-- Add iterators through database
-- Other helper functions for wallet
-
-
-- Optimize
-- Github
-    - Store Transactions??

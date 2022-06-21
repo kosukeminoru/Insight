@@ -1,9 +1,0 @@
-- determinism 
-
-- No pop-up window
-- Run in parralel
-
-- Validate Updated Game
-- Multiple Games
-
-- When Level Generation, Input hash and difficulty

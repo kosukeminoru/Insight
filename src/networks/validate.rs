@@ -3,5 +3,5 @@
 use libp2p::kad::{record::Key, Record};
 
 pub fn validate(a: &Key, b: &mut Record) -> bool {
-    false
+    true
 }

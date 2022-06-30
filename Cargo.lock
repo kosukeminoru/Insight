@@ -381,6 +381,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
 
 [[package]]
+name = "base64ct"
+version = "1.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bdca834647821e0b13d9539a8634eb62d3501b6b6c2cec1722786ee6671b851"
+
+[[package]]
 name = "bevy"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1125,6 +1131,9 @@ name = "bytes"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4872d67bab6358e59559027aa3b9157c53d9358c51423c17554809a8858e0f8"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "bzip2-sys"
@@ -2685,6 +2694,7 @@ version = "0.1.0"
 dependencies = [
  "async-std",
  "async-trait",
+ "base64ct",
  "bevy",
  "bevy_rapier2d",
  "clap",
@@ -2697,6 +2707,7 @@ dependencies = [
  "rocksdb",
  "serde",
  "serde_json",
+ "sha2 0.10.2",
  "tokio",
 ]
 
@@ -2875,6 +2886,7 @@ dependencies = [
  "rand 0.8.5",
  "ring",
  "rw-stream-sink 0.3.0",
+ "serde",
  "sha2 0.10.2",
  "smallvec",
  "thiserror",
@@ -2949,6 +2961,7 @@ dependencies = [
  "prost-build 0.10.4",
  "rand 0.7.3",
  "regex",
+ "serde",
  "sha2 0.10.2",
  "smallvec",
  "unsigned-varint",
@@ -2996,6 +3009,7 @@ dependencies = [
  "prost 0.10.4",
  "prost-build 0.10.4",
  "rand 0.7.3",
+ "serde",
  "sha2 0.10.2",
  "smallvec",
  "thiserror",
@@ -3605,6 +3619,8 @@ dependencies = [
  "core2",
  "digest 0.10.3",
  "multihash-derive",
+ "serde",
+ "serde-big-array",
  "sha2 0.10.2",
  "unsigned-varint",
 ]
@@ -4984,6 +5000,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "61ea8d54c77f8315140a05f4c7237403bf38b72704d031543aa1d16abbf517d1"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-big-array"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd31f59f6fe2b0c055371bb2f16d7f0aa7d8881676c04a55b1596d1a17cd10a4"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

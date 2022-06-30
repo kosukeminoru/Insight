@@ -1,1 +1,19 @@
-- Validate functions for all DHT
+Read Gossip sub + improvements and different topics 
+Create a plane v basic + game and connect to nodes
+Block creation and validation 
+TX creation and validation 
+
+
+- Return info on connect
+- Validate functions for all (block/tx) DHT
+- See what DHT looks like 
+- Add peers for all events gossipsub
+
+- 
+- Add bootnode + Autonat + hole punching
+
+
+
+send message tx + block and validate if invalid block then ban if invalid tx then warn 
+Kademlia event on closing -> Ensure 20 nodes at all time 
+

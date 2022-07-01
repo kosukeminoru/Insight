@@ -2,6 +2,6 @@
 
 use libp2p::kad::{record::Key, Record};
 
-pub fn validate(a: &Key, b: &mut Record) -> bool {
+pub fn validate(_a: &Key, _b: &mut Record) -> bool {
     true
 }

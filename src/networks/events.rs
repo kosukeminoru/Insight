@@ -43,8 +43,10 @@
 use libp2p::gossipsub;
 use libp2p::gossipsub::GossipsubEvent;
 use libp2p::kad::record::store::MemoryStore;
+use libp2p::kad::record::store::RecordStore;
 use libp2p::kad::{
-    AddProviderOk, Kademlia, KademliaEvent, PeerRecord, PutRecordOk, QueryResult, Record,
+    AddProviderOk, InboundRequest, Kademlia, KademliaEvent, PeerRecord, PutRecordOk, QueryResult,
+    Record,
 };
 use libp2p::{
     mdns::{Mdns, MdnsEvent},
@@ -60,8 +62,9 @@ pub struct MyBehaviour {
     pub mdns: Mdns,
 }
 
+//Gossipsub
 impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
-    // Called when `mdns` produces an event.
+    // Called when `gossipsub` produces an event.
     fn inject_event(&mut self, event: GossipsubEvent) {
         if let gossipsub::GossipsubEvent::Message {
             propagation_source: peer_id,
@@ -69,6 +72,7 @@ impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
             message,
         } = event
         {
+            //When recieved
             println!(
                 "Got message: {} with id: {} from peer: {:?}",
                 String::from_utf8_lossy(&message.data),
@@ -83,6 +87,7 @@ impl NetworkBehaviourEventProcess<MdnsEvent> for MyBehaviour {
     fn inject_event(&mut self, event: MdnsEvent) {
         if let MdnsEvent::Discovered(list) = event {
             for (peer_id, multiaddr) in list {
+                println!("Discovered {}", peer_id);
                 self.kademlia.add_address(&peer_id, multiaddr);
                 self.gossipsub.add_explicit_peer(&peer_id);
             }
@@ -146,7 +151,20 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
             KademliaEvent::RoutablePeer { peer, .. } => {
                 self.gossipsub.add_explicit_peer(&peer);
             }
-            _ => {}
+            KademliaEvent::InboundRequest { request } => match request {
+                InboundRequest::AddProvider { record } => {
+                    self.kademlia.store_mut().add_provider(record.unwrap());
+                }
+                InboundRequest::PutRecord {
+                    source,
+                    connection,
+                    record,
+                } => {
+                    self.kademlia.store_mut().put(record.unwrap());
+                }
+                _ => println!("{:?}", request),
+            },
+            _ => (),
         }
     }
 }

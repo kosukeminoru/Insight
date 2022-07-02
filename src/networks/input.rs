@@ -7,7 +7,7 @@ pub fn handle_input_line(swarm: &mut MyBehaviour, line: String, topic: Topic) {
 
     match args.next() {
         Some("PUB") => {
-            if let Err(e) = swarm.gossipsub.publish(topic.clone(), line) {
+            if let Err(e) = swarm.gossipsub.publish(topic, line) {
                 println!("Publish error: {:?}", e);
             }
         }

@@ -1,3 +1,8 @@
+Learn GOssip Sub + config 
+Implement holepunch + other protocols
+Comment+clean
+
+
 Read Gossip sub + improvements and different topics 
 Create a plane v basic + game and connect to nodes
 Block creation and validation 

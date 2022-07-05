@@ -42,6 +42,8 @@
 
 use libp2p::gossipsub;
 use libp2p::gossipsub::GossipsubEvent;
+use libp2p::identify::Identify;
+use libp2p::identify::IdentifyEvent;
 use libp2p::kad::record::store::MemoryStore;
 use libp2p::kad::record::store::RecordStore;
 use libp2p::kad::{
@@ -59,6 +61,7 @@ use libp2p::{
 pub struct MyBehaviour {
     pub gossipsub: libp2p::gossipsub::Gossipsub,
     pub kademlia: Kademlia<MemoryStore>,
+    pub identify: Identify,
     pub mdns: Mdns,
 }
 
@@ -87,9 +90,8 @@ impl NetworkBehaviourEventProcess<MdnsEvent> for MyBehaviour {
     fn inject_event(&mut self, event: MdnsEvent) {
         if let MdnsEvent::Discovered(list) = event {
             for (peer_id, multiaddr) in list {
-                println!("Discovered {}", peer_id);
                 self.kademlia.add_address(&peer_id, multiaddr);
-                self.gossipsub.add_explicit_peer(&peer_id);
+                //self.gossipsub.add_explicit_peer(&peer_id);
             }
         }
     }
@@ -148,9 +150,19 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
                 }
                 _ => {}
             },
-            KademliaEvent::RoutablePeer { peer, .. } => {
-                self.gossipsub.add_explicit_peer(&peer);
-            }
+            /*
+            KademliaEvent::RoutingUpdated { peer, old_peer, .. } => {
+                let mut iter = self.kademlia.kbuckets();
+                let mut count = 0;
+                for p in iter {
+                    //self.gossipsub.add_explicit_peer(p.node.key.preimage());
+                    //println!("{:?}", p.node.key.preimage());
+                    print!("new bucket: ");
+                    println!("{:?}", p.num_entries());
+                    println!("{:?}", count);
+                    count += 1;
+                }
+            }*/
             KademliaEvent::InboundRequest { request } => match request {
                 InboundRequest::AddProvider { record } => {
                     self.kademlia.store_mut().add_provider(record.unwrap());
@@ -166,5 +178,10 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
             },
             _ => (),
         }
+    }
+}
+impl NetworkBehaviourEventProcess<IdentifyEvent> for MyBehaviour {
+    fn inject_event(&mut self, message: IdentifyEvent) {
+        println!("{:?}", message);
     }
 }

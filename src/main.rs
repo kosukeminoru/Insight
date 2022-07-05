@@ -77,7 +77,7 @@ fn main() {
     }
     */
     //random key
-    let priva = identity::Keypair::generate_ed25519();
+    let priva: identity::Keypair = identity::Keypair::generate_ed25519();
     // for boot nodes. Create by above^^
     let x: [u8; 68] = [
         8, 1, 18, 64, 236, 219, 78, 215, 40, 219, 195, 32, 155, 130, 105, 2, 31, 197, 107, 68, 180,
@@ -86,7 +86,7 @@ fn main() {
         106, 120, 35, 196, 229, 115, 199, 174,
     ];
     //let priva = identity::Keypair::from_protobuf_encoding(&x).unwrap();
-    let peerid = PeerId::from(priva.public());
+    let peerid: PeerId = PeerId::from(priva.public());
     let my_future = networks::protocol::start_protocol(priva, peerid);
     block_on(my_future).expect("error");
 }

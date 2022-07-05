@@ -1,24 +1,26 @@
-Learn GOssip Sub + config 
+epiprotocol
+autonat 
+UPnp 
+Try IPV6 and Transports
+Learn Gossip Sub + config 
 Implement holepunch + other protocols
+Local ID requirements
 Comment+clean
+Reputation -> Kademlia integration 
 
+Join / update blockchain based on friends list / bootnode fallback 
+IP + Work to create an ID
 
-Read Gossip sub + improvements and different topics 
-Create a plane v basic + game and connect to nodes
-Block creation and validation 
-TX creation and validation 
+(How to communicate with game provider? Gossipsub? Floodsub?)
+Gossipsub -> send TXs + Block / Meta data Connecting / When explicit?? 
+Kademlia -> Store TXs + Blocks + Game Providers
+            connect to network  
+            Validate Blocks and Transactions stored
+                 Put in case of missing data
+            Negative + Positive scoring on behaviours
+            (integration of scoring with kademlia + ID requirements? (remove from dht(Score local)))
+            (Game side?)
+            Put level struct
+Hole punching -> In case Autonat returns false
 
-
-- Return info on connect
-- Validate functions for all (block/tx) DHT
-- See what DHT looks like 
-- Add peers for all events gossipsub
-
-- 
-- Add bootnode + Autonat + hole punching
-
-
-
-send message tx + block and validate if invalid block then ban if invalid tx then warn 
-Kademlia event on closing -> Ensure 20 nodes at all time 
-
+Doc scoring + ban

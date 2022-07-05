@@ -17,9 +17,10 @@ pub fn create_kademlia(local_key: identity::Keypair) -> Kademlia<MemoryStore> {
     config.set_protocol_name(std::borrow::Cow::Borrowed(NAME));
     config.set_query_timeout(Duration::from_secs(3 * 60));
     config.set_record_ttl(None);
+    config.set_parallelism(std::num::NonZeroUsize::new(5usize).unwrap());
     config.set_record_filtering(KademliaStoreInserts::FilterBoth);
     config.set_publication_interval(None);
-    config.set_replication_interval(Some(Duration::from_secs(5 * 60)));
+    config.set_replication_interval(Some(Duration::from_secs(1 * 60)));
     config.set_provider_record_ttl(None);
     config.set_provider_publication_interval(None);
     config.set_max_packet_size(usize::MAX);
@@ -37,13 +38,13 @@ pub fn create_kademlia(local_key: identity::Keypair) -> Kademlia<MemoryStore> {
 pub fn boot(mut swarm: Swarm<MyBehaviour>) -> Swarm<MyBehaviour> {
     //boot nodes
     let address: Multiaddr =
-        "/ip4/10.150.108.167/tcp/51736/p2p/12D3KooWCP6NcrcxmcAuCoHF5nya7f8GjojHy1DP8nKqQvbzbhvm"
+        "/ip4/192.168.1.197/tcp/54005/p2p/12D3KooWCP6NcrcxmcAuCoHF5nya7f8GjojHy1DP8nKqQvbzbhvm"
             .parse()
             .unwrap();
-    swarm
-        .behaviour_mut()
-        .kademlia
-        .add_address(&PeerId::try_from_multiaddr(&address).unwrap(), address);
+    swarm.behaviour_mut().kademlia.add_address(
+        &PeerId::try_from_multiaddr(&address).unwrap(),
+        address.clone(),
+    );
     //begin bootstrap
     let r = swarm.behaviour_mut().kademlia.bootstrap();
     loop {

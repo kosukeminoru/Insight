@@ -1,31 +1,24 @@
 use crate::networks::events::MyBehaviour;
 use crate::networks::input;
+use crate::networks::transport;
 use crate::networks::validate;
 use crate::networks::zgossipsub;
 use crate::networks::zkademlia;
-use crate::networks::zmdns;
 use async_std::{io, task};
 use futures::{prelude::*, select};
 use libp2p::gossipsub;
-use libp2p::gossipsub::{
-    GossipsubMessage, IdentTopic as Topic, MessageAuthenticity, MessageId, ValidationMode,
-};
-use libp2p::kad;
-use libp2p::kad::record::store::{MemoryStore, MemoryStoreConfig};
+use libp2p::gossipsub::IdentTopic as Topic;
+use libp2p::identify::{Identify, IdentifyConfig, IdentifyEvent};
+use libp2p::kad::record::store::MemoryStore;
 use libp2p::kad::Kademlia;
-use libp2p::kad::KademliaStoreInserts;
-use libp2p::kad::QueryInfo;
 use libp2p::multiaddr::Multiaddr;
 use libp2p::{
-    development_transport, identity,
+    identity,
     mdns::{Mdns, MdnsConfig},
     swarm::SwarmEvent,
     PeerId, Swarm,
 };
-use std::collections::hash_map::DefaultHasher;
 use std::error::Error;
-use std::hash::{Hash, Hasher};
-use std::time::Duration;
 
 pub async fn start_protocol(
     local_key: identity::Keypair,
@@ -36,28 +29,37 @@ pub async fn start_protocol(
     println!("{:?}", local_peer_id);
 
     let mut swarm = {
-        let transport = development_transport(local_key.clone()).await?;
+        let transport = transport::build_transport(local_key.clone()).await?;
         let gossipsub: gossipsub::Gossipsub = zgossipsub::create_gossip(local_key.clone());
         let kademlia: Kademlia<MemoryStore> = zkademlia::create_kademlia(local_key.clone());
         let mdns = task::block_on(Mdns::new(MdnsConfig::default()))?;
+        let identify = Identify::new(IdentifyConfig::new(
+            "1.0".to_string(),
+            local_key.clone().public(),
+        ));
         let behaviour = MyBehaviour {
             gossipsub,
             kademlia,
+            identify,
             mdns,
         };
         Swarm::new(transport, behaviour, local_peer_id)
     };
 
-    let topic = Topic::new("test-net");
-    swarm.behaviour_mut().gossipsub.subscribe(&topic);
+    let topic = Topic::new("Block");
+    swarm
+        .behaviour_mut()
+        .gossipsub
+        .subscribe(&topic)
+        .expect("Correct topic");
 
     // Read full lines from stdin
     let mut stdin = io::BufReader::new(io::stdin()).lines().fuse();
 
     // Listen on all interfaces and whatever port the OS assigns.
     swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
-    //
-    //swarm.listen_on("/ip4/10.150.108.167/tcp/51736".parse()?)?;
+    swarm.listen_on("/ip6/::0/tcp/0".parse()?)?;
+    //swarm.listen_on("/ip4/192.168.1.197/tcp/54005".parse()?)?;
     swarm = zkademlia::boot(swarm);
     // Kick it off.
     loop {

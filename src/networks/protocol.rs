@@ -11,7 +11,7 @@ use libp2p::gossipsub::IdentTopic as Topic;
 use libp2p::identify::{Identify, IdentifyConfig, IdentifyEvent};
 use libp2p::kad::record::store::MemoryStore;
 use libp2p::kad::Kademlia;
-use libp2p::multiaddr::Multiaddr;
+use libp2p::multiaddr;
 use libp2p::{
     identity,
     mdns::{Mdns, MdnsConfig},
@@ -55,8 +55,13 @@ pub async fn start_protocol(
 
     // Read full lines from stdin
     let mut stdin = io::BufReader::new(io::stdin()).lines().fuse();
-
-    // Listen on all interfaces and whatever port the OS assigns.
+    /*
+    swarm.listen_on(
+        "/ip4/127.0.0.1/tcp/8001/ws/p2p-webrtc-star"
+            .parse()
+            .unwrap(),
+    )
+    .unwrap();*/
     swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
     swarm.listen_on("/ip6/::0/tcp/0".parse()?)?;
     //swarm.listen_on("/ip4/192.168.1.197/tcp/54005".parse()?)?;

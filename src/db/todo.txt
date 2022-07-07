@@ -1,6 +1,7 @@
 - Add iterators through database
 - Other helper functions for wallet
 
+-less compile time
 
 - Optimize
 - Github

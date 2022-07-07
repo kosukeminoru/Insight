@@ -1,15 +1,38 @@
+//use crate::networks::webrtc;
 use libp2p::core;
 use libp2p::identity;
 use libp2p::Transport;
 use libp2p::{dns, mplex, noise, tcp, websocket, yamux, PeerId};
 
+use anyhow::Result;
+use async_trait::async_trait;
+use futures::future::FutureExt;
+use futures::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
+use futures::stream::StreamExt;
+use libp2p::core::upgrade;
+use libp2p::request_response::{
+    ProtocolName, ProtocolSupport, RequestResponse, RequestResponseCodec, RequestResponseConfig,
+    RequestResponseEvent, RequestResponseMessage,
+};
+use libp2p::swarm::{Swarm, SwarmBuilder, SwarmEvent};
+use libp2p_quic::{Crypto, Keypair, QuicConfig, ToLibp2p};
+use rand::RngCore;
+use std::time::Instant;
+use std::{io, iter};
+
 pub async fn build_transport(
     keypair: identity::Keypair,
 ) -> std::io::Result<core::transport::Boxed<(PeerId, core::muxing::StreamMuxerBox)>> {
     let transport = {
-        let dns_tcp = dns::DnsConfig::system(tcp::TcpConfig::new().nodelay(true)).await?;
+        let dns_tcp = dns::DnsConfig::system(tcp::TcpTransport::new(
+            tcp::GenTcpConfig::new().nodelay(true),
+        ))
+        .await?;
         let ws_dns_tcp = websocket::WsConfig::new(
-            dns::DnsConfig::system(tcp::TcpConfig::new().nodelay(true)).await?,
+            dns::DnsConfig::system(tcp::TcpTransport::new(
+                tcp::GenTcpConfig::new().nodelay(true),
+            ))
+            .await?,
         );
         dns_tcp.or_transport(ws_dns_tcp)
     };

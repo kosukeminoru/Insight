@@ -19,10 +19,16 @@ use libp2p::{
     PeerId, Swarm,
 };
 use std::error::Error;
+use std::sync::mpsc;
+use std::sync::mpsc::Receiver;
+use std::sync::mpsc::Sender;
+use std::sync::mpsc::TryRecvError;
+use std::{thread, time};
 
 pub async fn start_protocol(
     local_key: identity::Keypair,
     local_peer_id: PeerId,
+    sender: Sender<String>,
 ) -> Result<(), Box<dyn Error>> {
     env_logger::init();
 
@@ -73,6 +79,7 @@ pub async fn start_protocol(
             event = swarm.select_next_some() => match event {
                 SwarmEvent::NewListenAddr { address, .. } => {
                     println!("Listening in {:?}", address);
+                    sender.send("listenevent!".to_string()).unwrap();
                 },
                 _ => {}
             }

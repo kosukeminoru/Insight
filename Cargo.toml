@@ -29,4 +29,3 @@ log = "0.4.14"
 pin-project = "1.0.10"
 streamunordered = "0.5.2"
 thiserror = "1.0.30"
-libp2p-quic = {version = "0.6.1"}

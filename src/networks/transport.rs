@@ -15,7 +15,7 @@ use libp2p::request_response::{
     RequestResponseEvent, RequestResponseMessage,
 };
 use libp2p::swarm::{Swarm, SwarmBuilder, SwarmEvent};
-use libp2p_quic::{Crypto, Keypair, QuicConfig, ToLibp2p};
+
 use rand::RngCore;
 use std::time::Instant;
 use std::{io, iter};

@@ -73,7 +73,7 @@ pub fn player(
             }
         }
         //If released from dragging, shoot the player store location and change BoolReleased
-        else if btn.just_released(MouseButton::Left) {
+        else {
             release.b = BoolReleased::Yes;
             //if cursor is detectable store location and shoot
             if let Some(a) = window.cursor_position() {

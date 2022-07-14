@@ -1,5 +1,6 @@
 use crate::db;
 use crate::game;
+use bevy::app::App;
 use bevy::app::AppLabel;
 use bevy::ecs::{
     event::Events,
@@ -12,6 +13,7 @@ use bevy::ecs::{
     world::World,
 };
 use bevy::prelude::*;
+use bevy_rapier2d::pipeline::ContactForceEvent;
 use bevy_rapier2d::prelude::*;
 use std::mem;
 use std::{
@@ -35,8 +37,16 @@ pub fn run() {
     app.add_plugins_with(DefaultPlugins, |group| {
         group.disable::<bevy::log::LogPlugin>()
     });
-    app.add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0));
 
+    //app.insert_resource(game::conf::rap_conf());
+    app.insert_resource(SimulationToRenderTime::default())
+        .insert_resource(RapierContext::default())
+        .insert_resource(Events::<CollisionEvent>::default())
+        .insert_resource(Events::<ContactForceEvent>::default())
+        .insert_resource(game::conf::rap_conf())
+        .insert_resource(PhysicsHooksWithQueryResource::<NoUserData>(Box::new(())));
+
+    subapp.add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0));
     subapp
         .add_plugins_with(DefaultPlugins, |group| {
             group
@@ -60,12 +70,19 @@ pub fn run() {
     app.add_plugin(bevy::input::InputPlugin);*/
     //app.init_resource::<bevy::reflect::TypeRegistryArc>();
 
-    subapp.add_system(go);
+    subapp
+        .add_startup_system(add)
+        .add_system(game::player::player)
+        .add_system(game::collisions::win)
+        .add_system(game::collisions::collisions);
 
     app.add_sub_app(SubAppLabel, subapp, move |app_world, subapp| {
         // temporarily add the app world to the render world as a resource
+
+        //mem::swap(&mut Box::new(app_world), &mut Box::new(&mut subapp.world));
         mem::swap(app_world, &mut subapp.world);
         subapp.update();
+        //mem::swap(&mut Box::new(app_world), &mut Box::new(&mut subapp.world));
         mem::swap(app_world, &mut subapp.world);
         // move the app world back, as if nothing happened.
 
@@ -78,10 +95,6 @@ pub fn run() {
     //app.add_sub_app("string", default_subapp);
 
     app.run();
-}
-
-fn go() {
-    println!("Hello from game");
 }
 
 /*
@@ -174,3 +187,24 @@ subapp.insert_non_send_resource(bevy::winit::WinitWindows::default());
     subapp.insert_resource(bevy::winit::WinitSettings { ..default() });
     subapp.insert_resource(bevy::winit::WinitSettings { ..default() });
     v */
+
+fn add(mut commands: Commands) {
+    commands.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)));
+    commands.insert_resource(game::conf::rap_conf());
+    commands.insert_resource(game::conf::window_conf());
+    commands.insert_resource(game::player::Attempt {
+        first: None,
+        second: None,
+        third: None,
+        fourth: None,
+        fifth: None,
+    });
+    commands.insert_resource(game::player::Donde { shot: 1 });
+    commands.insert_resource(game::player::MouseResource {
+        first: Vec2::new(0., 0.),
+        second: Vec2::new(0., 0.),
+    });
+    commands.insert_resource(game::player::IsReleased {
+        b: game::player::BoolReleased::Yes,
+    });
+}

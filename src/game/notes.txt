@@ -1,2 +1,1 @@
-Switching in memory works. 
-Issue I think is that normal app is updating maybe? 
+Switching in memory works - May be slow -> optimizing by making world a pointer or box

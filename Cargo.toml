@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 bevy = "0.7.0"
-bevy_rapier2d = { version = "0.14.0", features = [ "enhanced-determinism" ]}
+bevy_rapier2d = { version = "0.15.0", features = [ "enhanced-determinism" ]}
 rand = { version = "0.8.5", features = ["small_rng"] }
 rand_pcg = "0.3.1"
 rand_seeder = "0.2.3"

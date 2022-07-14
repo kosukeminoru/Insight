@@ -8,10 +8,9 @@ use async_std::{io, task};
 use futures::{prelude::*, select};
 use libp2p::gossipsub;
 use libp2p::gossipsub::IdentTopic as Topic;
-use libp2p::identify::{Identify, IdentifyConfig, IdentifyEvent};
+use libp2p::identify::{Identify, IdentifyConfig};
 use libp2p::kad::record::store::MemoryStore;
 use libp2p::kad::Kademlia;
-use libp2p::multiaddr;
 use libp2p::{
     identity,
     mdns::{Mdns, MdnsConfig},
@@ -19,12 +18,7 @@ use libp2p::{
     PeerId, Swarm,
 };
 use std::error::Error;
-use std::sync::mpsc;
-use std::sync::mpsc::Receiver;
 use std::sync::mpsc::Sender;
-use std::sync::mpsc::TryRecvError;
-use std::{thread, time};
-
 pub async fn start_protocol(
     local_key: identity::Keypair,
     local_peer_id: PeerId,

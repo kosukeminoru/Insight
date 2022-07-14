@@ -1,0 +1,2 @@
+Switching in memory works. 
+Issue I think is that normal app is updating maybe? 

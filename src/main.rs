@@ -3,8 +3,7 @@
 // Using game as a separate crate
 use std::io;
 use std::sync::mpsc;
-use std::sync::mpsc::Receiver;
-use std::sync::mpsc::TryRecvError;
+
 use std::{thread, time};
 
 pub mod blockchain;
@@ -94,26 +93,28 @@ fn main() {
     let peerid: PeerId = PeerId::from(priva.public());
     // let my_future = networks::protocol::start_protocol(priva, peerid);
     // block_on(my_future).expect("error");
-
-    let network_channel = spawn_network_channel();
-    loop {
-        match network_channel.try_recv() {
-            Ok(key) => println!("Received: {}", key),
-            Err(TryRecvError::Empty) => println!("Channel empty"),
-            Err(TryRecvError::Disconnected) => panic!("Channel disconnected"),
-        }
-        sleep(1000);
-    }
-}
-
-fn spawn_network_channel() -> Receiver<String> {
     let priva: identity::Keypair = identity::Keypair::generate_ed25519();
     let peerid: PeerId = PeerId::from(priva.public());
     let (tx, rx) = mpsc::channel::<String>();
     let my_future = networks::protocol::start_protocol(priva, peerid, tx);
     thread::spawn(move || block_on(my_future).expect("heyo"));
-    rx
+    /*
+    loop {
+        match rx.try_recv() {
+            Ok(key) => println!("Received: {}", key),
+            Err(TryRecvError::Empty) => println!("Channel empty"),
+            Err(TryRecvError::Disconnected) => panic!("Channel disconnected"),
+        }
+        sleep(1000);
+    }*/
+    /*
+    let attempt: game::player::Attempt =
+        serde_json::from_str(&db::db::get(String::from("tempattempt"))).unwrap();*/
+    //validation::validation::run(attempt);*/
+    //thread::spawn(move || validation::validation::run(attempt));
+    game::simulation::run();
 }
+
 fn sleep(millis: u64) {
     let duration = time::Duration::from_millis(millis);
     thread::sleep(duration);

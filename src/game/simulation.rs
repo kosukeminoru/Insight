@@ -1,25 +1,11 @@
-use crate::db;
 use crate::game;
 use bevy::app::App;
 use bevy::app::AppLabel;
-use bevy::ecs::{
-    event::Events,
-    prelude::{FromWorld, IntoExclusiveSystem},
-    schedule::{
-        IntoSystemDescriptor, Schedule, ShouldRun, Stage, StageLabel, State, StateData, SystemSet,
-        SystemStage,
-    },
-    system::Resource,
-    world::World,
-};
+use bevy::ecs::event::Events;
 use bevy::prelude::*;
 use bevy_rapier2d::pipeline::ContactForceEvent;
 use bevy_rapier2d::prelude::*;
 use std::mem;
-use std::{
-    any::TypeId,
-    ops::{Deref, DerefMut},
-};
 
 pub fn run() {
     #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, AppLabel)]
@@ -33,18 +19,14 @@ pub fn run() {
     */
     //db::db::delete(String::from("gwin"));
     let mut app = App::new();
-    let mut subapp = App::new();
+
     app.add_plugins_with(DefaultPlugins, |group| {
         group.disable::<bevy::log::LogPlugin>()
     });
 
+    let mut subapp = App::new();
+
     //app.insert_resource(game::conf::rap_conf());
-    app.insert_resource(SimulationToRenderTime::default())
-        .insert_resource(RapierContext::default())
-        .insert_resource(Events::<CollisionEvent>::default())
-        .insert_resource(Events::<ContactForceEvent>::default())
-        .insert_resource(game::conf::rap_conf())
-        .insert_resource(PhysicsHooksWithQueryResource::<NoUserData>(Box::new(())));
 
     subapp.add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0));
     subapp
@@ -207,4 +189,10 @@ fn add(mut commands: Commands) {
     commands.insert_resource(game::player::IsReleased {
         b: game::player::BoolReleased::Yes,
     });
+    commands.insert_resource(SimulationToRenderTime::default());
+    commands.insert_resource(RapierContext::default());
+    commands.insert_resource(Events::<CollisionEvent>::default());
+    commands.insert_resource(Events::<ContactForceEvent>::default());
+    commands.insert_resource(game::conf::rap_conf());
+    commands.insert_resource(PhysicsHooksWithQueryResource::<NoUserData>(Box::new(())));
 }

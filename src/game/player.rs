@@ -1,4 +1,3 @@
-use crate::db;
 use crate::game;
 use crate::game::constants::WX;
 use crate::game::constants::WY;
@@ -6,7 +5,6 @@ use bevy::app::AppExit;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use serde::{Deserialize, Serialize};
-use serde_json;
 
 //which # shot we are on
 pub struct Donde {
@@ -140,7 +138,8 @@ pub fn shoot_player(commands: &mut Commands, resource: &MouseResource) {
 }
 
 // stores Mouse Resource (Change later needs key value )
-fn shoot_player_store(attempt: &Attempt) {
-    let serialized = serde_json::to_string(attempt).unwrap();
+fn shoot_player_store(_attempt: &Attempt) {
+
+    //let serialized = serde_json::to_string(attempt).unwrap();
     //db::db::put(String::from("tempattempt"), serialized);
 }

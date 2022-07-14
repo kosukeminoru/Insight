@@ -4,22 +4,6 @@ use libp2p::identity;
 use libp2p::Transport;
 use libp2p::{dns, mplex, noise, tcp, websocket, yamux, PeerId};
 
-use anyhow::Result;
-use async_trait::async_trait;
-use futures::future::FutureExt;
-use futures::io::{AsyncRead, AsyncWrite, AsyncWriteExt};
-use futures::stream::StreamExt;
-use libp2p::core::upgrade;
-use libp2p::request_response::{
-    ProtocolName, ProtocolSupport, RequestResponse, RequestResponseCodec, RequestResponseConfig,
-    RequestResponseEvent, RequestResponseMessage,
-};
-use libp2p::swarm::{Swarm, SwarmBuilder, SwarmEvent};
-
-use rand::RngCore;
-use std::time::Instant;
-use std::{io, iter};
-
 pub async fn build_transport(
     keypair: identity::Keypair,
 ) -> std::io::Result<core::transport::Boxed<(PeerId, core::muxing::StreamMuxerBox)>> {

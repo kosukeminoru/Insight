@@ -28,3 +28,6 @@ log = "0.4.14"
 pin-project = "1.0.10"
 streamunordered = "0.5.2"
 thiserror = "1.0.30"
+bevy_transform_gizmo = {path = "src/crates/bevy_transform_gizmo-0.2-2.1"}
+bevy_mod_picking = "0.7.0"
+bevy_mod_raycast = "0.5.0"

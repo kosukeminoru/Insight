@@ -731,6 +731,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_mod_picking"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee28e69e9bcd2990273c0d2a976ea0d5b499d154a15c6990864f85fbb6bbee9e"
+dependencies = [
+ "bevy",
+ "bevy_mod_raycast",
+]
+
+[[package]]
+name = "bevy_mod_raycast"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b84a8d57fb1f20aca8c6e3d96e724e54f0ec58ba1d8e8a0989ce3e52d52e2d23"
+dependencies = [
+ "bevy",
+ "float-ord",
+]
+
+[[package]]
 name = "bevy_pbr"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -820,7 +840,7 @@ dependencies = [
  "hex",
  "hexasphere",
  "image",
- "naga",
+ "naga 0.8.5",
  "once_cell",
  "parking_lot 0.11.2",
  "regex",
@@ -924,6 +944,16 @@ dependencies = [
  "bevy_hierarchy",
  "bevy_math",
  "bevy_reflect",
+]
+
+[[package]]
+name = "bevy_transform_gizmo"
+version = "0.2.1"
+dependencies = [
+ "bevy",
+ "bevy_mod_picking",
+ "bevy_mod_raycast",
+ "naga 0.9.0",
 ]
 
 [[package]]
@@ -1954,6 +1984,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "float-ord"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ce81f49ae8a0482e4c55ea62ebbd7e5a686af544c00b9d090bba3ff9be97b3d"
+
+[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2709,7 +2745,10 @@ dependencies = [
  "async-stream",
  "async-trait",
  "bevy",
+ "bevy_mod_picking",
+ "bevy_mod_raycast",
  "bevy_rapier2d",
+ "bevy_transform_gizmo",
  "clap",
  "env_logger 0.9.0",
  "futures",
@@ -3645,6 +3684,26 @@ dependencies = [
  "rustc-hash",
  "spirv",
  "thiserror",
+]
+
+[[package]]
+name = "naga"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5f50357e1167a3ab92d6b3c7f4bf5f7fd13fde3f4b28bf0d5ea07b5100fdb6c0"
+dependencies = [
+ "bit-set",
+ "bitflags",
+ "codespan-reporting",
+ "hexf-parse",
+ "indexmap",
+ "log",
+ "num-traits",
+ "rustc-hash",
+ "spirv",
+ "termcolor",
+ "thiserror",
+ "unicode-xid",
 ]
 
 [[package]]
@@ -5787,7 +5846,7 @@ dependencies = [
  "arrayvec",
  "js-sys",
  "log",
- "naga",
+ "naga 0.8.5",
  "parking_lot 0.11.2",
  "raw-window-handle",
  "smallvec",
@@ -5812,7 +5871,7 @@ dependencies = [
  "copyless",
  "fxhash",
  "log",
- "naga",
+ "naga 0.8.5",
  "parking_lot 0.11.2",
  "profiling",
  "raw-window-handle",
@@ -5846,7 +5905,7 @@ dependencies = [
  "libloading",
  "log",
  "metal",
- "naga",
+ "naga 0.8.5",
  "objc",
  "parking_lot 0.11.2",
  "profiling",

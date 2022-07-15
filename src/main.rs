@@ -11,6 +11,9 @@ pub mod networks;
 use futures::executor::block_on;
 use libp2p::{identity, PeerId};
 
+struct App {
+    int: u8,
+}
 fn main() {
     /*
         let r = db::db::get("list".to_string());

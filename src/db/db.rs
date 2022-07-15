@@ -1,5 +1,6 @@
 //use rocksdb::{DB, Options};
 // NB: db is automatically closed at end of lifetime
+/*
 use rocksdb::DBWithThreadMode;
 use rocksdb::MultiThreaded;
 use rocksdb::Options;
@@ -37,3 +38,4 @@ pub fn get(key: String) -> String {
         Err(_) => String::from("Err"),
     }
 }
+*/

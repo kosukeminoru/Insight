@@ -1,3 +1,4 @@
+/*
 use crate::db::db;
 use libp2p::PeerId;
 use rand::prelude::*;
@@ -27,3 +28,4 @@ pub struct Member {
     pub active: bool,
     pub value: u128,
 }
+*/

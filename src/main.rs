@@ -1,5 +1,3 @@
-#![windows_subsystem = "windows"]
-
 // Using game as a separate crate
 use std::sync::mpsc;
 

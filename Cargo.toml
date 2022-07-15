@@ -11,7 +11,6 @@ bevy_rapier2d = { version = "0.15.0", features = [ "enhanced-determinism" ]}
 rand = { version = "0.8.5", features = ["small_rng"] }
 rand_pcg = "0.3.1"
 rand_seeder = "0.2.3"
-rocksdb = "0.18.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.81"
 futures = "0.3"

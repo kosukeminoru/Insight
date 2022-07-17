@@ -2,6 +2,7 @@ use crate::game;
 use bevy::app::App;
 use bevy::app::AppLabel;
 use bevy::ecs::event::Events;
+use bevy::input::InputPlugin;
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy::winit::WinitPlugin;
@@ -9,6 +10,10 @@ use bevy_rapier2d::pipeline::ContactForceEvent;
 use bevy_rapier2d::prelude::*;
 use std::mem;
 use std::sync::Once;
+
+use crate::subapps;
+use subapps::renderer::camera::pan_orbit;
+use subapps::renderer::geometry::my_plane;
 
 static START: Once = Once::new();
 pub fn run() {
@@ -51,7 +56,7 @@ pub struct MyApp;
 impl Plugin for MyApp {
     fn build(&self, app: &mut App) {
         app.add_plugins_with(DefaultPlugins, |group| {
-            group
+            group.disable::<bevy::log::LogPlugin>()
                 .disable::<bevy::log::LogPlugin>()
                 .disable::<bevy::window::WindowPlugin>()
                 .disable::<bevy::winit::WinitPlugin>()
@@ -137,74 +142,13 @@ fn setup(
                 .looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
             ..default()
         })
-        .insert(Camera);
-}
-
-fn mouse_motion(
-    mut motion_evr: EventReader<MouseMotion>,
-    mut windows: ResMut<Windows>,
-    mut query: Query<&mut Transform, With<Camera>>,
-) {
-    let mut camera = query.single_mut();
-    let window = windows.get_primary_mut().unwrap();
-    window.set_cursor_lock_mode(true);
-
-    for ev in motion_evr.iter() {
-        let yaw = (ev.delta.x * (-0.2)).to_radians();
-        let pitch = (ev.delta.y * (-0.2)).to_radians();
-
-        let rot = camera.rotation;
-        camera.rotation =
-            Quat::from_axis_angle(Vec3::Y, yaw) * rot * Quat::from_axis_angle(Vec3::X, pitch);
+        
+       /*
+            .add_plugins(bevy_mod_picking::DefaultPickingPlugins)
+            .add_plugin(bevy_transform_gizmo::TransformGizmoPlugin::default()) // Use TransformGizmoPlugin::default() to align to the scene's coordinate system.
+            .add_startup_system(my_plane::setup_plane)
+            .add_startup_system(pan_orbit::spawn_camera)
+            .add_system(pan_orbit::pan_orbit_camera)
+            .add_system(my_plane::add_block);*/
     }
 }
-
-fn camera_control(
-    input: Res<Input<KeyCode>>,
-    time: Res<Time>,
-    mut query: Query<&mut Transform, With<Camera>>,
-) {
-    for mut transform in query.iter_mut() {
-        let mut direction = Vec3::ZERO;
-        if input.pressed(KeyCode::W) {
-            direction.x += 1.0;
-        }
-        if input.pressed(KeyCode::A) {
-            direction.z -= 1.0;
-        }
-        if input.pressed(KeyCode::S) {
-            direction.x -= 1.0;
-        }
-        if input.pressed(KeyCode::D) {
-            direction.z += 1.0;
-        }
-        if input.pressed(KeyCode::R) {
-            println!("{:?}", transform.rotation.to_axis_angle());
-            println!("{:?}", transform.forward());
-        }
-
-        transform.translation += time.delta_seconds() * 2.0 * direction;
-    }
-}
-
-/*.insert_resource(ClearColor(Color::rgb(0.75, 0.90, 1.0)))
-   .add_startup_system(setup)
-   .add_system(bevy::input::system::exit_on_esc_system)
-   .add_system(camera_control)
-   .add_system(mouse_motion);
-*/
-*/
-
-/*    subapp
-.add_plugins_with(DefaultPlugins, |group| {
-    group
-        .disable::<bevy::log::LogPlugin>()
-        .disable::<bevy::winit::WinitPlugin>()
-})
-//.add_plugin(RapierDebugRenderPlugin::default())
-.add_startup_system(game::conf::setup_graphics)
-.add_startup_system(game::level::setup_level)
-.add_startup_system(add)
-.add_system(game::player::player)
-.add_system(game::collisions::win)
-.add_system(game::collisions::collisions); */

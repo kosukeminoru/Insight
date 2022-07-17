@@ -7,6 +7,7 @@ pub mod blockchain;
 pub mod db;
 pub mod game;
 pub mod networks;
+pub mod subapps;
 
 use futures::executor::block_on;
 use libp2p::{identity, PeerId};

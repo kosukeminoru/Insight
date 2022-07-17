@@ -1,0 +1,8 @@
+.add_plugins(bevy_mod_picking::DefaultPickingPlugins)
+            .add_plugin(bevy_transform_gizmo::TransformGizmoPlugin::default()) // Use TransformGizmoPlugin::default() to align to the scene's coordinate system.
+            .add_startup_system(my_plane::setup_plane)
+            .add_startup_system(pan_orbit::spawn_camera)
+            .add_system(pan_orbit::pan_orbit_camera)
+            .add_system(my_plane::add_block);
+    }
+}   

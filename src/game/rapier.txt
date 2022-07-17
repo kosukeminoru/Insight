@@ -1,0 +1,30 @@
+.add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        .add_plugin(RapierDebugRenderPlugin::default())
+        .add_startup_system(game::conf::setup_graphics)
+        .add_startup_system(game::level::setup_level)
+        .add_startup_system(add)
+        .add_system(game::player::player)
+        .add_system(game::collisions::win)
+        .add_system(game::collisions::collisions);
+    }
+}
+fn add(mut commands: Commands) {
+    commands.insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)));
+    commands.insert_resource(game::conf::rap_conf());
+    commands.insert_resource(game::conf::window_conf());
+    commands.insert_resource(game::player::Attempt {
+        first: None,
+        second: None,
+        third: None,
+        fourth: None,
+        fifth: None,
+    });
+    commands.insert_resource(game::player::Donde { shot: 1 });
+    commands.insert_resource(game::player::MouseResource {
+        first: Vec2::new(0., 0.),
+        second: Vec2::new(0., 0.),
+    });
+    commands.insert_resource(game::player::IsReleased {
+        b: game::player::BoolReleased::Yes,
+    });
+}

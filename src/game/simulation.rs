@@ -4,13 +4,13 @@ use bevy::app::AppLabel;
 use bevy::ecs::event::Events;
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+use bevy::winit::WinitPlugin;
 use bevy_rapier2d::pipeline::ContactForceEvent;
 use bevy_rapier2d::prelude::*;
 use std::mem;
 use std::sync::Once;
 
 static START: Once = Once::new();
-
 pub fn run() {
     #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, AppLabel)]
     pub struct SubAppLabel;
@@ -23,38 +23,48 @@ pub fn run() {
     */
 
     let mut app = App::new();
+    /*
     app.add_plugins_with(DefaultPlugins, |group| {
         group.disable::<bevy::log::LogPlugin>()
-    });
+    });*/
+
+    //Mouse + graphics
+    app.add_plugins(MinimalPlugins);
+    app.add_plugin(bevy::window::WindowPlugin::default());
+    app.add_plugin(bevy::winit::WinitPlugin);
 
     let subapp = App::new();
 
     app.add_sub_app(SubAppLabel, subapp, move |app_world, subapp| {
         mem::swap(app_world, &mut subapp.world);
-
         START.call_once(|| {
             subapp.add_plugin(MyApp);
         });
-
         subapp.update();
         mem::swap(app_world, &mut subapp.world);
         //app_world = &mut subapp.world;
     });
     app.run();
 }
-pub struct MyApp;
 
+pub struct MyApp;
 impl Plugin for MyApp {
     fn build(&self, app: &mut App) {
-        app.add_plugins(MinimalPlugins)
-            .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
-            //.add_plugin(RapierDebugRenderPlugin::default())
-            .add_startup_system(game::conf::setup_graphics)
-            .add_startup_system(game::level::setup_level)
-            .add_startup_system(add)
-            .add_system(game::player::player)
-            .add_system(game::collisions::win)
-            .add_system(game::collisions::collisions);
+        app.add_plugins_with(DefaultPlugins, |group| {
+            group
+                .disable::<bevy::log::LogPlugin>()
+                .disable::<bevy::window::WindowPlugin>()
+                .disable::<bevy::winit::WinitPlugin>()
+                .disable::<bevy::core::CorePlugin>()
+        })
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
+        .add_plugin(RapierDebugRenderPlugin::default())
+        .add_startup_system(game::conf::setup_graphics)
+        .add_startup_system(game::level::setup_level)
+        .add_startup_system(add)
+        .add_system(game::player::player)
+        .add_system(game::collisions::win)
+        .add_system(game::collisions::collisions);
     }
 }
 fn add(mut commands: Commands) {

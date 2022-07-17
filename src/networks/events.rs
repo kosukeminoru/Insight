@@ -164,14 +164,20 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
             }*/
             KademliaEvent::InboundRequest { request } => match request {
                 InboundRequest::AddProvider { record } => {
-                    self.kademlia.store_mut().add_provider(record.unwrap());
+                    self.kademlia
+                        .store_mut()
+                        .add_provider(record.unwrap())
+                        .expect("err!");
                 }
                 InboundRequest::PutRecord {
-                    source,
-                    connection,
+                    source: _,
+                    connection: _,
                     record,
                 } => {
-                    self.kademlia.store_mut().put(record.unwrap());
+                    self.kademlia
+                        .store_mut()
+                        .put(record.unwrap())
+                        .expect("err!");
                 }
                 _ => println!("{:?}", request),
             },

@@ -1,6 +1,6 @@
 - Add iterators through database
 - Other helper functions for wallet
-- Security - Put DB with networks only
+
 -less compile time
 
 - Optimize

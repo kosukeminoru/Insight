@@ -1,15 +1,19 @@
-#![windows_subsystem = "windows"]
-
 // Using game as a separate crate
+use std::sync::mpsc;
+
+use std::thread;
 
 pub mod blockchain;
 pub mod db;
 pub mod game;
 pub mod networks;
-pub mod validation;
+
 use futures::executor::block_on;
 use libp2p::{identity, PeerId};
 
+struct App {
+    int: u8,
+}
 fn main() {
     /*
         let r = db::db::get("list".to_string());
@@ -77,18 +81,38 @@ fn main() {
     }
     */
     //random key
-    let priva: identity::Keypair = identity::Keypair::generate_ed25519();
+
     // for boot nodes. Create by above^^
-    let x: [u8; 68] = [
+    let _x: [u8; 68] = [
         8, 1, 18, 64, 236, 219, 78, 215, 40, 219, 195, 32, 155, 130, 105, 2, 31, 197, 107, 68, 180,
         113, 242, 11, 55, 254, 89, 219, 224, 73, 147, 124, 229, 211, 138, 11, 38, 25, 174, 72, 28,
         220, 126, 249, 123, 12, 164, 200, 89, 111, 56, 135, 128, 88, 250, 164, 86, 74, 172, 121,
         106, 120, 35, 196, 229, 115, 199, 174,
     ];
     //let priva = identity::Keypair::from_protobuf_encoding(&x).unwrap();
+
+    // let my_future = networks::protocol::start_protocol(priva, peerid);
+    // block_on(my_future).expect("error");
+    let priva: identity::Keypair = identity::Keypair::generate_ed25519();
     let peerid: PeerId = PeerId::from(priva.public());
-    let my_future = networks::protocol::start_protocol(priva, peerid);
-    block_on(my_future).expect("error");
+    let (tx, _rx) = mpsc::channel::<String>();
+    let my_future = networks::protocol::start_protocol(priva, peerid, tx);
+    thread::spawn(move || block_on(my_future).expect("heyo"));
+    /*
+    loop {
+        match rx.try_recv() {
+            Ok(key) => println!("Received: {}", key),
+            Err(TryRecvError::Empty) => println!("Channel empty"),
+            Err(TryRecvError::Disconnected) => panic!("Channel disconnected"),
+        }
+        sleep(1000);
+    }*/
+    /*
+    let attempt: game::player::Attempt =
+        serde_json::from_str(&db::db::get(String::from("tempattempt"))).unwrap();*/
+    //validation::validation::run(attempt);*/
+    //thread::spawn(move || validation::validation::run(attempt));
+    game::simulation::run();
 }
 
 //game::simulation::run();

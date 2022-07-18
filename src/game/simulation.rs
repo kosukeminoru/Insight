@@ -1,21 +1,21 @@
 use crate::game;
+use crate::subapps;
 use bevy::app::App;
 use bevy::app::AppLabel;
 use bevy::ecs::event::Events;
+use bevy::ecs::system::Resource;
 use bevy::input::mouse::MouseMotion;
 use bevy::input::InputPlugin;
 use bevy::prelude::*;
 use bevy::winit::WinitPlugin;
 use bevy_rapier2d::pipeline::ContactForceEvent;
 use bevy_rapier2d::prelude::*;
+use serde::{Deserialize, Serialize};
 use std::mem;
 use std::sync::Once;
 use std::time::Instant;
-
-use crate::subapps;
 use subapps::renderer::camera::pan_orbit;
 use subapps::renderer::geometry::my_plane;
-
 static START: Once = Once::new();
 static STARTER: Once = Once::new();
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
@@ -30,7 +30,6 @@ pub fn run() {
     pub struct SubGame;
     #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, AppLabel)]
     pub struct SubAppSwap;
-
     pub struct DaCount {
         boo: bool,
     };
@@ -57,7 +56,7 @@ pub fn run() {
     app.add_plugins(MinimalPlugins);
     app.add_plugin(bevy::window::WindowPlugin::default());
     app.add_plugin(bevy::winit::WinitPlugin);
-    app.insert_resource(MyApp);
+    app.insert_resource(areturn());
     app.insert_resource(DaCount { boo: true });
     let subapp_swap = App::new();
 
@@ -70,8 +69,9 @@ pub fn run() {
                 if subapp_game.world.get_resource::<DaCount>().unwrap().boo {
                     let mut count = subapp_game.world.get_resource_mut::<DaCount>().unwrap();
                     count.boo = false;
-                    let playing = subapp_game.world.get_resource::<MyApp>().unwrap();
-                    subapp_game.add_plugin(*playing);
+                    //println!("{:?}", subapp_game.world.components());
+                    let playing = subapp_game.world.get_resource::<Box<dyn Plugin>>().unwrap();
+                    subapp_game.add_plugin(**playing);
                 }
                 subapp_game.update();
                 mem::swap(app_world, &mut subapp_game.world);
@@ -86,6 +86,10 @@ pub fn run() {
     //app.add_system(bmark);
     app.run();
 }
+
+fn areturn() -> Box<dyn Plugin> {
+    return Box::new(MyApp);
+}
 /*
 fn go() {
     println!("hello");
@@ -96,7 +100,7 @@ fn bmark(mut Res: ResMut<Bench>) {
     println!("{:?}", Res);
 }*/
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, Reflect)]
 pub struct MyApp;
 impl Plugin for MyApp {
     fn build(&self, app: &mut App) {

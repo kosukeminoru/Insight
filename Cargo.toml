@@ -7,8 +7,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.7.0"
-bevy_rapier2d = { version = "0.15.0", features = [ "enhanced-determinism" ]}
+#bevy = "0.7.0"
+#bevy_rapier2d = { version = "0.15.0", features = [ "enhanced-determinism" ]}
 rand = { version = "0.8.5", features = ["small_rng"] }
 rand_pcg = "0.3.1"
 rand_seeder = "0.2.3"
@@ -29,6 +29,12 @@ log = "0.4.14"
 pin-project = "1.0.10"
 streamunordered = "0.5.2"
 thiserror = "1.0.30"
-bevy_transform_gizmo = {path = "src/crates/bevy_transform_gizmo-0.2-2.1"}
-bevy_mod_picking = "0.7.0"
-bevy_mod_raycast = "0.5.0"
+# bevy_transform_gizmo = {path = "src/crates/bevy_transform_gizmo-0.2-2.1"}
+# bevy_mod_picking = "0.7.0"
+# bevy_mod_raycast = "0.5.0"
+
+#pax branch merges most updated bevy code with Robert Swain's cubemap code (won't necessarily be in 0.8)
+bevy = {git = "https://github.com/paxsethorld/bevy.git", branch = "pax"}
+#bevy = "0.7"
+web-sys = "0.3.58" #works with .58 too but bevy blender doesn't
+bevy_blender = {git = "https://github.com/paxsethorld/bevy_blender.git", branch = "updated"}

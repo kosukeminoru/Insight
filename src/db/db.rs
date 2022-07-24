@@ -1,9 +1,8 @@
-//use rocksdb::{DB, Options};
+use rocksdb::{Options, DB};
 // NB: db is automatically closed at end of lifetime
-/*
+
 use rocksdb::DBWithThreadMode;
 use rocksdb::MultiThreaded;
-use rocksdb::Options;
 //Input value into the database with given key
 //Key and Value should be serialized
 pub fn put(key: String, value: String) {
@@ -38,4 +37,3 @@ pub fn get(key: String) -> String {
         Err(_) => String::from("Err"),
     }
 }
-*/

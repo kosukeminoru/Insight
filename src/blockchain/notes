@@ -1,0 +1,8 @@
+Structures
+- Who is active
+- Bounty Queue
+- Valid only after certain time, else valid when next block is recieved.
+
+- Ledger account
+- PBFT alg
+- First Join

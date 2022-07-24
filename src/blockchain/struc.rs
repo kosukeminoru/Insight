@@ -1,13 +1,8 @@
-use crate::db::db;
 use libp2p::PeerId;
-use rand::prelude::*;
 use serde::{Deserialize, Serialize};
-use serde_json;
+
 use std::collections::HashMap;
 //use rand_seeder::{Seeder, SipHasher};
-use crate::blockchain;
-use rand_pcg::Pcg64;
-use rand_seeder::Seeder;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BountyList {
@@ -39,8 +34,8 @@ impl OnlineList {
 }
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct AccountInfo {
-    value: f32,
-    nonce: u32,
+    pub value: f32,
+    pub nonce: u32,
 }
 impl AccountInfo {
     pub fn default() -> AccountInfo {
@@ -65,7 +60,7 @@ pub struct ValueList {
     pub list: HashMap<PeerId, AccountInfo>,
 }
 impl ValueList {
-    pub fn account(&mut self, peer: &PeerId) -> Option<&AccountInfo> {
+    pub fn account(&self, peer: &PeerId) -> Option<&AccountInfo> {
         self.list.get(peer)
     }
     pub fn add(&mut self, peer: PeerId, v: f32) {

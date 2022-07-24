@@ -1,9 +1,12 @@
 use super::struc::ValueList;
 use libp2p::core::identity::secp256k1::Keypair;
 use libp2p::core::identity::secp256k1::PublicKey;
+use libp2p::core::identity::PublicKey as PubKey;
+use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
 use serde_big_array::BigArray;
 use sha2::{Digest, Sha256};
+use std::collections::VecDeque;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Transaction {
     data: TxData,
@@ -26,12 +29,23 @@ impl Transaction {
         let result: String = format!("{:X}", hasher.finalize());
         result
     }
-    pub fn verify_transaction(&self, values: ValueList) -> bool {
+    pub fn verify_transaction_sig(&self) -> bool {
         let pubkey: PublicKey = PublicKey::decode(&self.data.sender).unwrap();
         let v_data = self.data.hash();
         let msg: &[u8] = &*v_data.as_bytes();
         let sig: &[u8] = &self.signature;
         pubkey.verify_hash(msg, sig)
+    }
+    pub fn verify_value(&self, values: &ValueList) -> bool {
+        let pubkey: PublicKey = PublicKey::decode(&self.data.sender).unwrap();
+        let acc = values
+            .account(&PeerId::from_public_key(&PubKey::Secp256k1(pubkey)))
+            .unwrap();
+        if acc.value <= self.data.value && acc.nonce == self.data.nonce {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 
@@ -59,5 +73,17 @@ impl TxData {
         hasher.update(serialized);
         let result: String = format!("{:X}", hasher.finalize());
         result
+    }
+}
+
+pub struct MemPool {
+    txs: VecDeque<Transaction>,
+}
+impl MemPool {
+    pub fn push(&mut self, tx: Transaction) {
+        self.txs.push_back(tx);
+    }
+    pub fn pop(&mut self) -> Option<Transaction> {
+        self.txs.pop_front()
     }
 }

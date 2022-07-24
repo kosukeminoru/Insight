@@ -1,4 +1,4 @@
-use rocksdb::{Options, DB};
+use rocksdb::Options;
 // NB: db is automatically closed at end of lifetime
 
 use rocksdb::DBWithThreadMode;

@@ -1,28 +1,38 @@
+use super::{
+    struc::ValueList,
+    transactions::{MemPool, Transaction},
+};
 use crate::blockchain::struc;
 use crate::db::db;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
+use serde_big_array::BigArray;
 use serde_json;
 use sha2::{Digest, Sha256};
 use std::time::SystemTime;
+
 #[derive(Serialize, Deserialize, Debug)]
-pub struct BlockHeader {
+pub struct Block {
     /// Reference to the previous block in the chain.
     pub prev_blockhash: String,
     pub bounty: PeerId,
     /// The timestamp of the block, as claimed by the miner.
     pub time: SystemTime,
     // The nonce, selected to obtain a low enough blockhash.
-    pub tx_hash: String,
+    pub tx_hash: Vec<Transaction>,
     pub world: String,
 }
 
-impl BlockHeader {
-    pub fn default() -> BlockHeader {
-        BlockHeader::new(last_block().hash(), "".to_string(), "".to_string())
+impl Block {
+    pub fn default() -> Block {
+        Block::new(
+            last_block().hash(),
+            Vec::<Transaction>::with_capacity(100),
+            "".to_string(),
+        )
     }
-    pub fn new(prev: String, tx: String, w: String) -> BlockHeader {
-        BlockHeader {
+    pub fn new(prev: String, tx: Vec<Transaction>, w: String) -> Block {
+        Block {
             prev_blockhash: prev,
             time: SystemTime::now(),
             bounty: struc::BountyList::get_bounty(),
@@ -38,20 +48,21 @@ impl BlockHeader {
         println!("{:?}", result);
         result
     }
+    pub fn generate_next_block(&self, mut mem: MemPool, mut value: &ValueList) -> (Block, MemPool) {
+        let mut tx = Vec::<Transaction>::with_capacity(100);
+        while tx.len() < 100 {
+            if let Some(txt) = mem.pop() {
+                if txt.verify_transaction_sig() && txt.verify_value(&mut value) {
+                    tx.push(txt);
+                }
+            } else {
+                break;
+            }
+        }
+        (Block::new(last_block().hash(), tx, "".to_string()), mem)
+    }
 }
-pub fn last_block() -> BlockHeader {
-    let last: BlockHeader = serde_json::from_str(&db::get("last".to_string())).unwrap();
+pub fn last_block() -> Block {
+    let last: Block = serde_json::from_str(&db::get("last".to_string())).unwrap();
     last
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Transaction {
-    from: Option<PeerId>,
-    to: Vec<PeerId>,
-    value: Vec<f32>,
-}
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Move {
-    who: PeerId,
-    to: u32,
 }

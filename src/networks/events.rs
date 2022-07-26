@@ -40,6 +40,8 @@
 //!
 //! 4. Close with Ctrl-c.
 
+use crossbeam_channel::Sender;
+use game_components::struc::NetworkInfo;
 use libp2p::gossipsub;
 use libp2p::gossipsub::GossipsubEvent;
 use libp2p::identify::Identify;
@@ -55,6 +57,7 @@ use libp2p::{
     swarm::NetworkBehaviourEventProcess,
     NetworkBehaviour,
 };
+
 #[derive(NetworkBehaviour)]
 #[behaviour(event_process = true)]
 pub struct MyBehaviour {
@@ -62,9 +65,10 @@ pub struct MyBehaviour {
     pub kademlia: Kademlia<MemoryStore>,
     pub identify: Identify,
     pub mdns: Mdns,
+    #[behaviour(ignore)]
+    pub sender: Sender<NetworkInfo>,
 }
 
-//Gossipsub
 impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
     // Called when `gossipsub` produces an event.
     fn inject_event(&mut self, event: GossipsubEvent) {

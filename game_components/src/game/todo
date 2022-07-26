@@ -1,0 +1,9 @@
+Switching in memory works - May be slow -> optimizing by making world a pointer or box
+
+Need -> 
+Identify all players with their PeerIDs,
+Add friends 
+Identify Bounty 
+When bounty is killed, See who killed them 
+
+Re-Synchronization 

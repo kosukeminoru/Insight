@@ -1,5 +1,5 @@
 use bevy::{
-    input::mouse::{MouseButtonInput, MouseMotion, MouseWheel},
+    input::mouse::{MouseMotion, MouseWheel},
     prelude::*,
 };
 
@@ -41,7 +41,7 @@ pub fn pan_orbit_camera(
     let mut scroll = 0.0;
     let mut orbit_button_changed = false;
 
-    if keys.pressed(KeyCode::Space){
+    if keys.pressed(KeyCode::Space) {
         if input_mouse.pressed(orbit_button) {
             //println!("space and orbit pressed");
             for ev in ev_motion.iter() {

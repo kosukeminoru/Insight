@@ -1,4 +1,4 @@
-use game_components::struc::ValueList;
+use components::struc::ValueList;
 use libp2p::core::identity::secp256k1::Keypair;
 use libp2p::core::identity::secp256k1::PublicKey;
 use libp2p::core::identity::PublicKey as PubKey;

@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 void = "1.0.2"
 crossbeam-channel = "0.5.6"
-game_components = {path = "game_components"}
+components = {path = "components"}
 bevy = "0.7.0"
 bevy_rapier2d = { version = "0.15.0", features = [ "enhanced-determinism" ]}
 rand = { version = "0.8.5", features = ["small_rng"] }
@@ -31,7 +31,7 @@ log = "0.4.14"
 pin-project = "1.0.10"
 streamunordered = "0.5.2"
 thiserror = "1.0.30"
-bevy_transform_gizmo = {path = "game_components/crates/bevy_transform_gizmo-0.2-2.1"}
+bevy_transform_gizmo = {path = "components/crates/bevy_transform_gizmo-0.2-2.1"}
 bevy_mod_picking = "0.7.0"
 bevy_mod_raycast = "0.5.0"
 rocksdb = "0.18.0"

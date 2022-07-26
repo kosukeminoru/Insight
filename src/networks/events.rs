@@ -40,8 +40,8 @@
 //!
 //! 4. Close with Ctrl-c.
 
+use components::struc::NetworkInfo;
 use crossbeam_channel::Sender;
-use game_components::struc::NetworkInfo;
 use libp2p::gossipsub;
 use libp2p::gossipsub::GossipsubEvent;
 use libp2p::identify::Identify;

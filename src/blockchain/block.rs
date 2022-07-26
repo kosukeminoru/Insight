@@ -1,7 +1,7 @@
 use super::transactions::{MemPool, Transaction};
 use crate::networks::db::db;
-use game_components::struc;
-use game_components::struc::ValueList;
+use components::struc;
+use components::struc::ValueList;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
 use serde_json;

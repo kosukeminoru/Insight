@@ -1,5 +1,5 @@
 [package]
-name = "game_components"
+name = "components"
 version = "0.1.0"
 edition = "2021"
 

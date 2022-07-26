@@ -1401,6 +1401,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "components"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-std",
+ "async-stream",
+ "async-trait",
+ "bevy",
+ "bevy_mod_picking",
+ "bevy_mod_raycast",
+ "bevy_rapier2d",
+ "bevy_transform_gizmo",
+ "clap",
+ "crossbeam-channel",
+ "env_logger 0.9.0",
+ "futures",
+ "http",
+ "libp2p",
+ "log",
+ "pin-project",
+ "rand 0.8.5",
+ "rand_pcg",
+ "rand_seeder",
+ "rocksdb",
+ "serde",
+ "serde-big-array 0.4.1",
+ "serde_json",
+ "sha2 0.10.2",
+ "streamunordered",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
 name = "concurrent-queue"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2172,40 +2206,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "game_components"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-std",
- "async-stream",
- "async-trait",
- "bevy",
- "bevy_mod_picking",
- "bevy_mod_raycast",
- "bevy_rapier2d",
- "bevy_transform_gizmo",
- "clap",
- "crossbeam-channel",
- "env_logger 0.9.0",
- "futures",
- "http",
- "libp2p",
- "log",
- "pin-project",
- "rand 0.8.5",
- "rand_pcg",
- "rand_seeder",
- "rocksdb",
- "serde",
- "serde-big-array 0.4.1",
- "serde_json",
- "sha2 0.10.2",
- "streamunordered",
- "thiserror",
- "tokio",
-]
-
-[[package]]
 name = "generic-array"
 version = "0.14.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2795,10 +2795,10 @@ dependencies = [
  "bevy_rapier2d",
  "bevy_transform_gizmo",
  "clap",
+ "components",
  "crossbeam-channel",
  "env_logger 0.9.0",
  "futures",
- "game_components",
  "http",
  "libp2p",
  "log",

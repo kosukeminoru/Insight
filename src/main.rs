@@ -5,9 +5,8 @@ use std::thread;
 
 pub mod blockchain;
 pub mod db;
-pub mod game;
+use game;
 pub mod networks;
-pub mod subapps;
 
 use futures::executor::block_on;
 use libp2p::{identity, PeerId};
@@ -109,7 +108,7 @@ fn main() {
         serde_json::from_str(&db::db::get(String::from("tempattempt"))).unwrap();*/
     //validation::validation::run(attempt);*/
     //thread::spawn(move || validation::validation::run(attempt));
-    game::simulation::run();
+    game::insight::simulation::run();
 }
 
 //game::simulation::run();

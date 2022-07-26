@@ -1,6 +1,6 @@
-use crate::game;
-use crate::game::constants::WX;
-use crate::game::constants::WY;
+use crate::insight;
+use crate::insight::constants::WX;
+use crate::insight::constants::WY;
 use bevy::app::AppExit;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
@@ -53,7 +53,7 @@ pub fn player(
     let mut proceed: bool = true;
     //Iterates through velocities if moving, proceed = false
     for vel in velocity.iter() {
-        if game::collisions::moving(vel) == true {
+        if insight::collisions::moving(vel) == true {
             proceed = false;
         }
     }

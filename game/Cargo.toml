@@ -1,12 +1,11 @@
 [package]
-name = "launch"
+name = "game"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-game = {path = "game"}
 bevy = "0.7.0"
 bevy_rapier2d = { version = "0.15.0", features = [ "enhanced-determinism" ]}
 rand = { version = "0.8.5", features = ["small_rng"] }
@@ -29,7 +28,7 @@ log = "0.4.14"
 pin-project = "1.0.10"
 streamunordered = "0.5.2"
 thiserror = "1.0.30"
-bevy_transform_gizmo = {path = "game/crates/bevy_transform_gizmo-0.2-2.1"}
+bevy_transform_gizmo = {path = "crates/bevy_transform_gizmo-0.2-2.1"}
 bevy_mod_picking = "0.7.0"
 bevy_mod_raycast = "0.5.0"
 rocksdb = "0.18.0"

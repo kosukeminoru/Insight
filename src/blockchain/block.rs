@@ -19,7 +19,7 @@ pub struct Block {
     /// The timestamp of the block, as claimed by the miner.
     pub time: SystemTime,
     // The nonce, selected to obtain a low enough blockhash.
-    pub tx_hash: Vec<Transaction>,
+    pub tx: Vec<Transaction>,
     pub world: String,
 }
 
@@ -31,12 +31,12 @@ impl Block {
             "".to_string(),
         )
     }
-    pub fn new(prev: String, tx: Vec<Transaction>, w: String) -> Block {
+    pub fn new(prev: String, t: Vec<Transaction>, w: String) -> Block {
         Block {
             prev_blockhash: prev,
             time: SystemTime::now(),
             bounty: struc::BountyList::get_bounty(),
-            tx_hash: tx,
+            tx: t,
             world: w,
         }
     }
@@ -61,6 +61,7 @@ impl Block {
         }
         (Block::new(last_block().hash(), tx, "".to_string()), mem)
     }
+    pub fn validate(&self) {}
 }
 pub fn last_block() -> Block {
     let last: Block = serde_json::from_str(&db::get("last".to_string())).unwrap();

@@ -1,0 +1,13 @@
+Switching in memory works - May be slow -> optimizing by making world a pointer or box
+
+Need -> 
+immutable pointer to 
+Accounts with 3 people
+Current Bounty
+
+Identify all players with their PeerIDs,
+Add friends 
+Identify Bounty 
+When bounty is killed, See who killed them 
+Reviever Listner
+Re-Synchronization 

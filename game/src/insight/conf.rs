@@ -1,5 +1,5 @@
-use crate::game::constants::WX;
-use crate::game::constants::WY;
+use crate::insight::constants::WX;
+use crate::insight::constants::WY;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 

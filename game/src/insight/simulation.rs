@@ -1,4 +1,4 @@
-use crate::game;
+use crate::insight;
 use bevy::app::App;
 use bevy::app::AppLabel;
 use bevy::ecs::event::Events;

@@ -1,10 +1,9 @@
 use super::transactions::{MemPool, Transaction};
-use crate::db::db;
-use game::struc;
-use game::struc::ValueList;
+use crate::networks::db::db;
+use game_components::struc;
+use game_components::struc::ValueList;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
-use serde_big_array::BigArray;
 use serde_json;
 use sha2::{Digest, Sha256};
 use std::time::SystemTime;

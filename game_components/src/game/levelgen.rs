@@ -1,5 +1,5 @@
-use crate::insight::constants::WX;
-use crate::insight::constants::WY;
+use super::constants::WX;
+use super::constants::WY;
 use rand::prelude::*;
 //use rand_seeder::{Seeder, SipHasher};
 use rand_pcg::Pcg64;

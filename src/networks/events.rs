@@ -41,7 +41,7 @@
 //! 4. Close with Ctrl-c.
 
 use crossbeam_channel::Sender;
-use game::struc::Accounts;
+use game_components::struc::NetworkInfo;
 use libp2p::gossipsub;
 use libp2p::gossipsub::GossipsubEvent;
 use libp2p::identify::Identify;
@@ -52,7 +52,6 @@ use libp2p::kad::{
     AddProviderOk, InboundRequest, Kademlia, KademliaEvent, PeerRecord, PutRecordOk, QueryResult,
     Record,
 };
-use libp2p::swarm::DummyBehaviour;
 use libp2p::{
     mdns::{Mdns, MdnsEvent},
     swarm::NetworkBehaviourEventProcess,
@@ -67,7 +66,7 @@ pub struct MyBehaviour {
     pub identify: Identify,
     pub mdns: Mdns,
     #[behaviour(ignore)]
-    pub sender: Sender<Accounts>,
+    pub sender: Sender<NetworkInfo>,
 }
 
 impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {

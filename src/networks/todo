@@ -1,26 +1,26 @@
 epiprotocol
-autonat 
-UPnp 
+autonat
+UPnp
 Try IPV6 and Transports
-Learn Gossip Sub + config 
+Learn Gossip Sub + config
 Implement holepunch + other protocols
 Local ID requirements
 Comment+clean
-Reputation -> Kademlia integration 
+Reputation -> Kademlia integration
 
-Join / update blockchain based on friends list / bootnode fallback 
+Join / update blockchain based on friends list / bootnode fallback
 IP + Work to create an ID
 
 (How to communicate with game provider? Gossipsub? Floodsub?)
-Gossipsub -> send TXs + Block / Meta data Connecting / When explicit?? 
+Gossipsub -> send TXs + Block / Meta data Connecting / When explicit??
 Kademlia -> Store TXs + Blocks + Game Providers
-            connect to network  
-            Validate Blocks and Transactions stored
-                 Put in case of missing data
-            Negative + Positive scoring on behaviours
-            (integration of scoring with kademlia + ID requirements? (remove from dht(Score local)))
-            (Game side?)
-            Put level struct
+connect to network  
+ Validate Blocks and Transactions stored
+Put in case of missing data
+Negative + Positive scoring on behaviours
+(integration of scoring with kademlia + ID requirements? (remove from dht(Score local)))
+(Game side?)
+Put level struct
 Hole punching -> In case Autonat returns false
 
 Doc scoring + ban

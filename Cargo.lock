@@ -2172,7 +2172,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "game"
+name = "game_components"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -2798,7 +2798,7 @@ dependencies = [
  "crossbeam-channel",
  "env_logger 0.9.0",
  "futures",
- "game",
+ "game_components",
  "http",
  "libp2p",
  "log",

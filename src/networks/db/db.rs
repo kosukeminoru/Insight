@@ -3,7 +3,6 @@
 use rocksdb::DBWithThreadMode;
 use rocksdb::MultiThreaded;
 use rocksdb::Options;
-use rocksdb::DB;
 //Input value into the database with given key
 //Key and Value should be serialized
 pub fn put(key: String, value: String) {

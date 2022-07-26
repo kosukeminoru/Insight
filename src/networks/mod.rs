@@ -1,3 +1,4 @@
+pub mod db;
 pub mod events;
 pub mod input;
 pub mod protocol;

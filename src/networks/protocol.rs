@@ -7,7 +7,7 @@ use crate::networks::zkademlia;
 use async_std::{io, task};
 use crossbeam_channel::Sender;
 use futures::{prelude::*, select};
-use game::struc::Accounts;
+use game_components::struc::NetworkInfo;
 use libp2p::gossipsub;
 use libp2p::gossipsub::IdentTopic as Topic;
 use libp2p::identify::{Identify, IdentifyConfig};
@@ -23,10 +23,10 @@ use std::error::Error;
 pub async fn start_protocol(
     local_key: identity::Keypair,
     local_peer_id: PeerId,
-    sender: Sender<Accounts>,
+    sender: Sender<NetworkInfo>,
 ) -> Result<(), Box<dyn Error>> {
     env_logger::init();
-    sender.send(Accounts::default()).unwrap();
+    sender.send(NetworkInfo::default()).unwrap();
     println!("{:?}", local_peer_id);
 
     let mut swarm = {

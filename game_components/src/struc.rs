@@ -1,6 +1,6 @@
+use crate::peers;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
-
 use std::collections::HashMap;
 //use rand_seeder::{Seeder, SipHasher};
 
@@ -101,6 +101,25 @@ impl Accounts {
             value: ValueList {
                 list: HashMap::<PeerId, AccountInfo>::new(),
             },
+        }
+    }
+}
+#[derive(Serialize, Deserialize, Debug)]
+pub struct NetworkInfo {
+    accounts: Accounts,
+    bounty: PeerId,
+}
+impl NetworkInfo {
+    pub fn new(a: Accounts, b: PeerId) -> NetworkInfo {
+        NetworkInfo {
+            accounts: a,
+            bounty: b,
+        }
+    }
+    pub fn default() -> NetworkInfo {
+        NetworkInfo {
+            accounts: Accounts::default(),
+            bounty: PeerId::from_bytes(&peers::P1ID).unwrap(),
         }
     }
 }

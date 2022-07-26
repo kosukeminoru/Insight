@@ -1,2 +1,2 @@
 [build]
-target-dir = "game/target"
+target-dir = "game_components/target"

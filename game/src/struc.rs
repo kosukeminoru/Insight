@@ -89,3 +89,18 @@ pub struct Accounts {
     pub active: OnlineList,
     pub value: ValueList,
 }
+impl Accounts {
+    pub fn default() -> Accounts {
+        Accounts {
+            bounty_list: BountyList {
+                list: HashMap::<PeerId, u32>::new(),
+            },
+            active: OnlineList {
+                list: HashMap::<PeerId, bool>::new(),
+            },
+            value: ValueList {
+                list: HashMap::<PeerId, AccountInfo>::new(),
+            },
+        }
+    }
+}

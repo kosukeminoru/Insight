@@ -1,14 +1,12 @@
 // Using game as a separate crate
-use std::sync::mpsc;
-
+use crossbeam_channel::bounded;
 use std::thread;
-
 pub mod blockchain;
 pub mod db;
 use game;
 pub mod networks;
-
 use futures::executor::block_on;
+use game::struc::Accounts;
 use libp2p::{identity, PeerId};
 fn main() {
     /*
@@ -89,10 +87,10 @@ fn main() {
 
     // let my_future = networks::protocol::start_protocol(priva, peerid);
     // block_on(my_future).expect("error");
+    let (s, r) = bounded::<Accounts>(1);
     let priva: identity::Keypair = identity::Keypair::generate_ed25519();
     let peerid: PeerId = PeerId::from(priva.public());
-    let (tx, _rx) = mpsc::channel::<String>();
-    let my_future = networks::protocol::start_protocol(priva, peerid, tx);
+    let my_future = networks::protocol::start_protocol(priva, peerid, s);
     thread::spawn(move || block_on(my_future).expect("heyo"));
     /*
     loop {
@@ -108,7 +106,7 @@ fn main() {
         serde_json::from_str(&db::db::get(String::from("tempattempt"))).unwrap();*/
     //validation::validation::run(attempt);*/
     //thread::spawn(move || validation::validation::run(attempt));
-    game::insight::simulation::run();
+    game::insight::simulation::run(r);
 }
 
 //game::simulation::run();

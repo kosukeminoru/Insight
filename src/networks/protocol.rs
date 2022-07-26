@@ -5,7 +5,9 @@ use crate::networks::validate;
 use crate::networks::zgossipsub;
 use crate::networks::zkademlia;
 use async_std::{io, task};
+use crossbeam_channel::Sender;
 use futures::{prelude::*, select};
+use game::struc::Accounts;
 use libp2p::gossipsub;
 use libp2p::gossipsub::IdentTopic as Topic;
 use libp2p::identify::{Identify, IdentifyConfig};
@@ -18,14 +20,13 @@ use libp2p::{
     PeerId, Swarm,
 };
 use std::error::Error;
-use std::sync::mpsc::Sender;
 pub async fn start_protocol(
     local_key: identity::Keypair,
     local_peer_id: PeerId,
-    sender: Sender<String>,
+    sender: Sender<Accounts>,
 ) -> Result<(), Box<dyn Error>> {
     env_logger::init();
-
+    sender.send(Accounts::default()).unwrap();
     println!("{:?}", local_peer_id);
 
     let mut swarm = {
@@ -42,6 +43,7 @@ pub async fn start_protocol(
             kademlia,
             identify,
             mdns,
+            sender,
         };
         Swarm::new(transport, behaviour, local_peer_id)
     };
@@ -73,7 +75,7 @@ pub async fn start_protocol(
             event = swarm.select_next_some() => match event {
                 SwarmEvent::NewListenAddr { address, .. } => {
                     println!("Listening in {:?}", address);
-                    sender.send("listenevent!".to_string()).unwrap();
+
                 },
                 _ => {}
             }

@@ -1,4 +1,6 @@
 use crate::insight;
+use crate::struc::Accounts;
+use crate::subapps;
 use bevy::app::App;
 use bevy::app::AppLabel;
 use bevy::ecs::event::Events;
@@ -8,15 +10,14 @@ use bevy::prelude::*;
 use bevy::winit::WinitPlugin;
 use bevy_rapier2d::pipeline::ContactForceEvent;
 use bevy_rapier2d::prelude::*;
+use crossbeam_channel::Receiver;
+use crossbeam_channel::{unbounded, RecvError};
 use std::mem;
 use std::sync::Once;
-
-use crate::subapps;
 use subapps::renderer::camera::pan_orbit;
 use subapps::renderer::geometry::my_plane;
-
 static START: Once = Once::new();
-pub fn run() {
+pub fn run(reciever: Receiver<Accounts>) {
     #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, AppLabel)]
     pub struct SubAppLabel;
     /* create app
@@ -28,11 +29,14 @@ pub fn run() {
     */
 
     let mut app = App::new();
-    /*
+
     app.add_plugins_with(DefaultPlugins, |group| {
         group.disable::<bevy::log::LogPlugin>()
-    });*/
-
+    });
+    app.add_plugin(MyApp);
+    app.insert_resource(reciever);
+    app.add_system(update_accounts);
+    /*
     //Mouse + graphics
     app.add_plugins(MinimalPlugins);
     app.add_plugin(bevy::window::WindowPlugin::default());
@@ -48,13 +52,15 @@ pub fn run() {
         subapp.update();
         mem::swap(app_world, &mut subapp.world);
         //app_world = &mut subapp.world;
-    });
+    });*/
+
     app.run();
 }
 
 pub struct MyApp;
 impl Plugin for MyApp {
     fn build(&self, app: &mut App) {
+        /*
         app.add_plugins_with(DefaultPlugins, |group| {
             group
                 .disable::<bevy::log::LogPlugin>()
@@ -62,12 +68,19 @@ impl Plugin for MyApp {
                 .disable::<bevy::window::WindowPlugin>()
                 .disable::<bevy::winit::WinitPlugin>()
                 .disable::<bevy::core::CorePlugin>()
-        })
-        .add_plugins(bevy_mod_picking::DefaultPickingPlugins)
-        .add_plugin(bevy_transform_gizmo::TransformGizmoPlugin::default()) // Use TransformGizmoPlugin::default() to align to the scene's coordinate system.
-        .add_startup_system(my_plane::setup_plane)
-        .add_startup_system(pan_orbit::spawn_camera)
-        .add_system(pan_orbit::pan_orbit_camera)
-        .add_system(my_plane::add_block);
+        })*/
+        app.add_plugins(bevy_mod_picking::DefaultPickingPlugins)
+            .add_plugin(bevy_transform_gizmo::TransformGizmoPlugin::default()) // Use TransformGizmoPlugin::default() to align to the scene's coordinate system.
+            .add_startup_system(my_plane::setup_plane)
+            .add_startup_system(pan_orbit::spawn_camera)
+            .add_system(pan_orbit::pan_orbit_camera)
+            .add_system(my_plane::add_block);
+    }
+}
+
+fn update_accounts(mut commands: Commands, r: Res<Receiver<Accounts>>) {
+    if let Result::Ok(accounts) = r.try_recv() {
+        println!("{:?}", accounts);
+        commands.insert_resource(accounts);
     }
 }

@@ -1,9 +1,7 @@
-use super::{
-    struc::ValueList,
-    transactions::{MemPool, Transaction},
-};
-use crate::blockchain::struc;
+use super::transactions::{MemPool, Transaction};
 use crate::db::db;
+use game::struc;
+use game::struc::ValueList;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
 use serde_big_array::BigArray;

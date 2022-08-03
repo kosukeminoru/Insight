@@ -4,6 +4,7 @@ use libp2p::kad::record::store::{MemoryStore, MemoryStoreConfig};
 use libp2p::kad::Kademlia;
 use libp2p::kad::KademliaStoreInserts;
 use libp2p::kad::QueryInfo;
+use libp2p::kad::{record::Key, Quorum, Record};
 use libp2p::multiaddr::Multiaddr;
 use libp2p::Swarm;
 use libp2p::{identity, PeerId};
@@ -26,7 +27,7 @@ pub fn create_kademlia(local_key: identity::Keypair) -> Kademlia<MemoryStore> {
     config.set_max_packet_size(usize::MAX);
     let mem_config = MemoryStoreConfig {
         max_records: usize::MAX,
-        max_value_bytes: usize::MAX,
+        max_value_bytes: 100,
         max_provided_keys: 20,
         max_providers_per_key: 20,
     };
@@ -37,6 +38,7 @@ pub fn create_kademlia(local_key: identity::Keypair) -> Kademlia<MemoryStore> {
 
 pub fn boot(mut swarm: Swarm<MyBehaviour>) -> Swarm<MyBehaviour> {
     //boot nodes
+
     let address: Multiaddr =
         "/ip4/192.168.1.197/tcp/54005/p2p/12D3KooWCP6NcrcxmcAuCoHF5nya7f8GjojHy1DP8nKqQvbzbhvm"
             .parse()

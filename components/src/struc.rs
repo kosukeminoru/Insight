@@ -105,21 +105,60 @@ impl Accounts {
     }
 }
 #[derive(Serialize, Deserialize, Debug)]
+pub struct FriendsList {
+    list: Vec<PeerId>,
+}
+impl FriendsList {
+    pub fn default() -> FriendsList {
+        FriendsList {
+            list: vec![
+                PeerId::from_bytes(&peers::P1ID).unwrap(),
+                PeerId::from_bytes(&peers::P2ID).unwrap(),
+                PeerId::from_bytes(&peers::P3ID).unwrap(),
+            ],
+        }
+    }
+    pub fn list(&self) -> &Vec<PeerId> {
+        &self.list
+    }
+    pub fn add_friend(mut self, peer: PeerId) {
+        self.list.push(peer);
+    }
+    pub fn remove_friend(mut self, peer: PeerId) -> Option<PeerId> {
+        let peer_pos = self.list.iter().position(|&x| x == peer);
+        match peer_pos {
+            Some(pos) => {
+                self.list.remove(pos);
+                return Some(peer);
+            }
+            None => None,
+        }
+    }
+}
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Request {
+    AddFriend(PeerId),
+    RemoveFriend(PeerId),
+}
+#[derive(Serialize, Deserialize, Debug)]
 pub struct NetworkInfo {
     accounts: Accounts,
     bounty: PeerId,
+    friends: FriendsList,
 }
 impl NetworkInfo {
-    pub fn new(a: Accounts, b: PeerId) -> NetworkInfo {
+    pub fn new(a: Accounts, b: PeerId, f: FriendsList) -> NetworkInfo {
         NetworkInfo {
             accounts: a,
             bounty: b,
+            friends: f,
         }
     }
     pub fn default() -> NetworkInfo {
         NetworkInfo {
             accounts: Accounts::default(),
             bounty: PeerId::from_bytes(&peers::P1ID).unwrap(),
+            friends: FriendsList::default(),
         }
     }
 }

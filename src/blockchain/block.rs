@@ -1,5 +1,4 @@
 use super::transactions::{MemPool, Transaction};
-use crate::networks::db::db;
 use components::struc;
 use components::struc::ValueList;
 use libp2p::PeerId;
@@ -9,6 +8,9 @@ use sha2::{Digest, Sha256};
 use std::time::SystemTime;
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct HashString(String);
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Block {
     /// Reference to the previous block in the chain.
     pub prev_blockhash: String,
@@ -22,11 +24,13 @@ pub struct Block {
 
 impl Block {
     pub fn default() -> Block {
-        Block::new(
-            last_block().hash(),
-            Vec::<Transaction>::with_capacity(100),
-            "".to_string(),
-        )
+        Block {
+            prev_blockhash: "000000000000000".to_string(),
+            tx: Vec::<Transaction>::with_capacity(100),
+            world: "".to_string(),
+            time: SystemTime::now(),
+            bounty: struc::BountyList::get_bounty(),
+        }
     }
     pub fn new(prev: String, t: Vec<Transaction>, w: String) -> Block {
         Block {
@@ -36,14 +40,6 @@ impl Block {
             tx: t,
             world: w,
         }
-    }
-    pub fn hash(&self) -> String {
-        let mut hasher = Sha256::new();
-        let serialized = serde_json::to_string(self).unwrap();
-        hasher.update(serialized);
-        let result: String = format!("{:X}", hasher.finalize());
-        println!("{:?}", result);
-        result
     }
     pub fn generate_next_block(&self, mut mem: MemPool, mut value: &ValueList) -> (Block, MemPool) {
         let mut tx = Vec::<Transaction>::with_capacity(100);
@@ -56,11 +52,23 @@ impl Block {
                 break;
             }
         }
-        (Block::new(last_block().hash(), tx, "".to_string()), mem)
+        (
+            Block::new(block_hash(&last_block()), tx, "".to_string()),
+            mem,
+        )
     }
     pub fn validate(&self) {}
 }
 pub fn last_block() -> Block {
-    let last: Block = serde_json::from_str(&db::get("last".to_string())).unwrap();
-    last
+    //let last: Block = serde_json::from_str(&db::get("last".to_string())).unwrap();
+    Block::default()
+}
+
+pub fn block_hash(block: &Block) -> String {
+    let mut hasher = Sha256::new();
+    let serialized = serde_json::to_string(block).unwrap();
+    hasher.update(serialized);
+    let result: String = format!("{:X}", hasher.finalize());
+    println!("{:?}", result);
+    result
 }

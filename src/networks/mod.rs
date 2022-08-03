@@ -6,3 +6,5 @@ pub mod transport;
 pub mod validate;
 pub mod zgossipsub;
 pub mod zkademlia;
+pub mod zrequest;
+pub mod util;

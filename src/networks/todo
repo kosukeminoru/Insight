@@ -1,3 +1,13 @@
+Genesis Structs
+Bootstrap Friends List
+Requests - Send TX - Add friend - Create Block - Claimed Bounty
+Kademlia Config - Only bounty claimed - validate new blocks
+BFT Protocol - Recieve and validate block
+Store all headers
+Genesis Structs
+Quic
+re-sync
+
 epiprotocol
 autonat
 UPnp

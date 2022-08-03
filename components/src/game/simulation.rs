@@ -1,13 +1,15 @@
 use crate::struc::NetworkInfo;
+use crate::struc::Request;
 use crate::subapps;
 use bevy::app::App;
 //use bevy::app::AppLabel;
 use bevy::prelude::*;
 use crossbeam_channel::Receiver;
+use crossbeam_channel::Sender;
 use subapps::renderer::camera::pan_orbit;
 use subapps::renderer::geometry::my_plane;
 
-pub fn run(reciever: Receiver<NetworkInfo>) {
+pub fn run(reciever: Receiver<NetworkInfo>, sender: Sender<Request>) {
     /* create app
        structs are added as resources which can be fetched later
        Rapier added as a plugin
@@ -17,12 +19,19 @@ pub fn run(reciever: Receiver<NetworkInfo>) {
     */
 
     let mut app = App::new();
+    let info;
+    match reciever.try_recv() {
+        Ok(i) => info = i,
+        Err(_) => info = NetworkInfo::default(),
+    }
+    app.insert_resource(info);
 
     app.add_plugins_with(DefaultPlugins, |group| {
         group.disable::<bevy::log::LogPlugin>()
     });
     app.add_plugin(MyApp);
     app.insert_resource(reciever);
+    app.insert_resource(sender);
     app.add_system(update_accounts);
 
     app.run();

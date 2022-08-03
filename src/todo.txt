@@ -10,9 +10,6 @@
     - App Store
 - Updating
 
-- Optimizations
-- Paralel Threads
-
 - Think about optimizations
 - Read through Rust Documentation
 - Read through Bevy and Rapier Documentation 

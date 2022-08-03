@@ -7,10 +7,10 @@ use serde::{Deserialize, Serialize};
 use serde_big_array::BigArray;
 use sha2::{Digest, Sha256};
 use std::collections::VecDeque;
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Transaction {
-    data: TxData,
-    signature: Vec<u8>,
+    pub data: TxData,
+    pub signature: Vec<u8>,
 }
 impl Transaction {
     pub fn new(k: Keypair, t: PublicKey, v: f32, n: u32) -> Transaction {
@@ -49,14 +49,14 @@ impl Transaction {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TxData {
     #[serde(with = "BigArray")]
-    sender: [u8; 33],
+    pub sender: [u8; 33],
     #[serde(with = "BigArray")]
-    recepient: [u8; 33],
-    value: f32,
-    nonce: u32,
+    pub recepient: [u8; 33],
+    pub value: f32,
+    pub nonce: u32,
 }
 impl TxData {
     pub fn new(from: [u8; 33], to: [u8; 33], val: f32, once: u32) -> TxData {

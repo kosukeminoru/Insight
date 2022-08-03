@@ -1,4 +1,12 @@
-Switching in memory works - May be slow -> optimizing by making world a pointer or box
+Genesis Block 
+- Genesis Accounts 
+- Genesis Friends List 
+- Game VM?
+Modularity -> Player Creation
+Market Place 
+Spectators
+Tutorial
+Communication to backend
 
 Need -> 
 Identify all players with their PeerIDs,
@@ -7,3 +15,6 @@ Identify Bounty
 When bounty is killed, See who killed them 
 
 Re-Synchronization 
+
+
+Switching in memory works - May be slow -> optimizing by making world a pointer or box

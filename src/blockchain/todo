@@ -1,5 +1,6 @@
 signatures
 Merkle for tx
+Select New Bounty 
 
 Ordering ->
 On start, if no previous block, put genesis block, put genesis structs

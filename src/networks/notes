@@ -1,12 +1,3 @@
-Back up protocol for edge cases. 2. Go through Kademlia until last block = last block or until height = last block.height, adjust money, if block not found, full node request block. Recieved, Put in Kademlia. If successful, continue, else warn the user and suggest restart. If Heights not same 3. Listen to new block, validate, block must be from new bounty
-
-- If not recieved
-  - Propogate wait
-  - Propogate limit
-
-4. Occasional Syncs
-   - Desync?
-5. Active list?
-
-Working, then unit test for everything
-Game to Networks events
+Identify event, handshake accounts + Block
+Handle Forks
+Include work

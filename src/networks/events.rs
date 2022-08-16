@@ -3,20 +3,25 @@ use super::util;
 use super::zrequest::BlockCodec;
 use super::zrequest::BlockRequest;
 use super::zrequest::BlockResponse;
+use crate::blockchain::block::accounts_hash;
 use crate::blockchain::block::block_hash;
 use crate::blockchain::block::Block;
+use crate::blockchain::transactions;
+use crate::blockchain::transactions::Transaction;
 use components::struc::Accounts;
 use components::struc::FriendsList;
 use components::struc::NetworkInfo;
 use components::struc::Request;
 use crossbeam_channel::Receiver;
 use crossbeam_channel::Sender;
-use libp2p::core::PublicKey;
+use libp2p::core::identity::secp256k1::PublicKey;
+use libp2p::core::identity::PublicKey as PubKey;
 use libp2p::gossipsub;
 use libp2p::gossipsub::GossipsubEvent;
 use libp2p::gossipsub::IdentTopic as Topic;
 use libp2p::identify::Identify;
 use libp2p::identify::IdentifyEvent;
+use libp2p::identify::IdentifyInfo;
 use libp2p::kad::record::store::MemoryStore;
 use libp2p::kad::record::store::RecordStore;
 use libp2p::kad::{record::Key, Quorum, Record};
@@ -33,10 +38,29 @@ use libp2p::{
     NetworkBehaviour,
 };
 
+pub fn update_accounts(a: &mut Accounts, b: Block) {
+    for t in b.tx {
+        let spubkey: PublicKey = PublicKey::decode(&t.data.sender).unwrap();
+        let rpubkey: PublicKey = PublicKey::decode(&t.data.recepient).unwrap();
+        let ammount = t.data.value;
+        a.value.add(
+            PeerId::from_public_key(&PubKey::Secp256k1(rpubkey)),
+            ammount,
+        );
+        a.value.sub(
+            PeerId::from_public_key(&PubKey::Secp256k1(spubkey.clone())),
+            ammount,
+        );
+        a.value
+            .nonce_increment(PeerId::from_public_key(&PubKey::Secp256k1(spubkey)));
+    }
+}
 pub struct BootHelper {
     pub temp_last: String,
     pub old_last: String,
     pub friends_last: Vec<String>,
+    pub friends_last_block: Vec<Block>,
+    pub friends_accnts: Vec<Accounts>,
 }
 //custom out event
 //two kademlias
@@ -59,11 +83,51 @@ pub struct MyBehaviour {
     #[behaviour(ignore)]
     pub last_block: Block,
     #[behaviour(ignore)]
-    // change to temp_last
+    pub mempool: transactions::MemPool,
+    #[behaviour(ignore)]
     pub boot_helper: BootHelper,
     #[behaviour(ignore)]
     pub node_type: NodeType,
 }
+/*
+enum Event {
+    Identify(IdentifyEvent),
+    GossipSub(GossipsubEvent),
+    KademliaBounty(KademliaEvent),
+    KademliaPeers(KademliaEvent),
+    RequestResponse(RequestResponseEvent<BlockRequest, BlockResponse>),
+    Mdns(MdnsEvent),
+}
+impl From<IdentifyEvent> for Event {
+  fn from(event: IdentifyEvent) -> Self {
+    Self::Identify(event)
+  }
+}
+impl From<GossipsubEvent> for Event {
+  fn from(event: GossipsubEvent) -> Self {
+    Self::Identify(event)
+  }
+}
+impl From<Kademlia> for Event {
+  fn from(event: IdentifyEvent) -> Self {
+    Self::Identify(event)
+  }
+}
+impl From<IdentifyEvent> for Event {
+  fn from(event: IdentifyEvent) -> Self {
+    Self::Identify(event)
+  }
+}
+impl From<IdentifyEvent> for Event {
+  fn from(event: IdentifyEvent) -> Self {
+    Self::Identify(event)
+  }
+}
+impl From<IdentifyEvent> for Event {
+  fn from(event: IdentifyEvent) -> Self {
+    Self::Identify(event)
+  }
+}*/
 pub enum NodeType {
     FullNode,
     LightNode,
@@ -84,7 +148,7 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
                     self.request
                         .send_response(
                             channel,
-                            BlockResponse(block_hash(&db::try_get_last_block())),
+                            BlockResponse(self.accounts.clone(), self.last_block.clone()),
                         )
                         .expect("response error");
                 }
@@ -92,28 +156,50 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
                     request_id: _,
                     response,
                 } => {
-                    let BlockResponse(hash) = response;
-                    self.boot_helper.friends_last.push(hash);
-                    if self.friends.list().len() == self.boot_helper.friends_last.len() {
-                        self.boot_helper
-                            .friends_last
-                            .retain(|x| x != &"".to_string());
-                        let freq = util::most_frequent(&self.boot_helper.friends_last, 1)[0]
-                            .1
-                            .to_string();
-                        if freq != block_hash(&self.last_block) {
-                            let mut most_frequent_hash = Vec::<String>::new();
-                            most_frequent_hash.push(freq.clone());
-                            self.boot_helper.temp_last = freq;
-                            self.boot_helper.old_last = block_hash(&self.last_block);
-                            self.boot_helper.friends_last = most_frequent_hash;
-                            self.kademlia.get_record(
-                                Key::new(&self.boot_helper.friends_last[0]),
-                                Quorum::One,
-                            );
-                        } else {
-                            let topic = Topic::new("Block");
-                            self.gossipsub.subscribe(&topic).expect("Correct topic");
+                    let BlockResponse(accounts, block) = response;
+                    if block.validate() {
+                        self.boot_helper.friends_last.push(block_hash(&block));
+                        self.boot_helper.friends_last_block.push(block);
+                        self.boot_helper.friends_accnts.push(accounts);
+                        if self.friends.list().len() == self.boot_helper.friends_last.len() {
+                            self.boot_helper
+                                .friends_last
+                                .retain(|x| x != &"".to_string());
+                            let freq = util::most_frequent(&self.boot_helper.friends_last, 1)[0]
+                                .1
+                                .to_string();
+                            if freq != block_hash(&self.last_block) {
+                                for block in &self.boot_helper.friends_last_block {
+                                    if block_hash(block) == freq {
+                                        for accounts in &self.boot_helper.friends_accnts {
+                                            if accounts_hash(accounts) == block.world {
+                                                self.accounts = accounts.clone();
+                                                break;
+                                            }
+                                        }
+                                        self.last_block = block.clone();
+                                        break;
+                                    }
+                                }
+                                self.sender
+                                    .send(NetworkInfo::new(
+                                        self.accounts.clone(),
+                                        self.friends.clone(),
+                                    ))
+                                    .expect("thread err");
+                                let mut most_frequent_hash = Vec::<String>::new();
+                                most_frequent_hash.push(freq.clone());
+                                self.boot_helper.temp_last = freq;
+                                self.boot_helper.old_last = block_hash(&self.last_block);
+                                self.boot_helper.friends_last = most_frequent_hash;
+                                self.kademlia.get_record(
+                                    Key::new(&self.boot_helper.friends_last[0]),
+                                    Quorum::One,
+                                );
+                            } else {
+                                let topic = Topic::new("Block");
+                                self.gossipsub.subscribe(&topic).expect("Correct topic");
+                            }
                         }
                     }
                 }
@@ -128,7 +214,7 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
                     self.boot_helper
                         .friends_last
                         .retain(|x| x != &"".to_string());
-                    let freq = util::most_frequent(&self.boot_helper.friends_last, 1)[0]
+                    let freq = util::most_frequent(&self.boot_helper.friends_last, 2)[0]
                         .1
                         .to_string();
                     if freq != block_hash(&self.last_block) {
@@ -141,6 +227,7 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
                             .get_record(Key::new(&self.boot_helper.friends_last[0]), Quorum::One);
                     } else {
                         let topic = Topic::new("Block");
+
                         self.gossipsub.subscribe(&topic).expect("Correct topic");
                     }
                 }
@@ -159,6 +246,34 @@ impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
             message,
         } = event
         {
+            let b = Topic::new("Block").hash().into_string();
+            let t = Topic::new("Transaction").hash().into_string();
+            if message.topic.as_str() == &b {
+                let block = db::deserialize::<Block>(&message.data).expect("Error deserializing");
+                if block.validate_new(&self.accounts.value) {
+                    db::put(
+                        block_hash(&block),
+                        db::serialize(&block).expect("Error serializing"),
+                    )
+                    .expect("db put error");
+                    update_accounts(&mut self.accounts, block.clone());
+                    self.sender
+                        .send(NetworkInfo::new(
+                            self.accounts.clone(),
+                            self.friends.clone(),
+                        ))
+                        .expect("Thread send error");
+                    self.mempool.rm(&block.tx);
+                    self.last_block = block;
+                }
+            } else if message.topic.as_str() == &t {
+                let tx =
+                    db::deserialize::<Transaction>(&message.data).expect("Error deserializing");
+                if tx.verify_transaction_sig() {
+                    self.mempool.push(tx);
+                }
+            }
+
             //When recieved
             println!(
                 "Got message: {} with id: {} from peer: {:?}",
@@ -216,20 +331,20 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
                                 for txs in &recieved_block.tx {
                                     self.accounts.value.add(
                                         PeerId::from_public_key(
-                                            &PublicKey::from_protobuf_encoding(&txs.data.recepient)
+                                            &PubKey::from_protobuf_encoding(&txs.data.recepient)
                                                 .expect("PublicKey conversion failed"),
                                         ),
                                         txs.data.value,
                                     );
                                     self.accounts.value.sub(
                                         PeerId::from_public_key(
-                                            &PublicKey::from_protobuf_encoding(&txs.data.sender)
+                                            &PubKey::from_protobuf_encoding(&txs.data.sender)
                                                 .expect("PublicKey conversion failed"),
                                         ),
                                         txs.data.value,
                                     );
                                     self.accounts.value.nonce_increment(PeerId::from_public_key(
-                                        &PublicKey::from_protobuf_encoding(&txs.data.sender)
+                                        &PubKey::from_protobuf_encoding(&txs.data.sender)
                                             .expect("PublicKey conversion failed"),
                                     ));
                                 }
@@ -329,7 +444,29 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
     }
 }
 impl NetworkBehaviourEventProcess<IdentifyEvent> for MyBehaviour {
-    fn inject_event(&mut self, _message: IdentifyEvent) {
+    fn inject_event(&mut self, message: IdentifyEvent) {
+        if let IdentifyEvent::Received {
+            peer_id,
+            info:
+                IdentifyInfo {
+                    listen_addrs,
+                    protocols,
+                    ..
+                },
+        } = message
+        {
+            const NAME: &[u8] = b"/insight";
+            let name = std::borrow::Cow::Borrowed(NAME);
+            if protocols
+                .iter()
+                .any(|p| std::borrow::Cow::Borrowed(p.as_bytes()) == name)
+            {
+                for addr in listen_addrs {
+                    self.kademlia.add_address(&peer_id, addr);
+                }
+            }
+        }
+
         /*
         match message {
             IdentifyEvent::Received { peer_id, info } => {
@@ -337,8 +474,4 @@ impl NetworkBehaviourEventProcess<IdentifyEvent> for MyBehaviour {
             }
         }*/
     }
-}
-
-fn suggest() {
-    println!("someting wong")
 }

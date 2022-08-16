@@ -1,6 +1,8 @@
 use super::db::db;
 use crate::blockchain::block::block_hash;
 use crate::blockchain::block::Block;
+use crate::blockchain::transactions;
+use crate::blockchain::transactions::Transaction;
 use crate::networks::events::BootHelper;
 use crate::networks::events::MyBehaviour;
 use crate::networks::events::NodeType;
@@ -13,6 +15,7 @@ use crate::networks::zrequest;
 use crate::networks::zrequest::BlockRequest;
 use async_std::{io, task};
 use async_trait::async_trait;
+use components::struc::AccountInfo;
 use components::struc::Accounts;
 use components::struc::FriendsList;
 use components::struc::NetworkInfo;
@@ -29,13 +32,13 @@ use libp2p::request_response::{
     ProtocolName, ProtocolSupport, RequestResponse, RequestResponseCodec, RequestResponseConfig,
     RequestResponseEvent, RequestResponseMessage,
 };
+use libp2p::Multiaddr;
 use libp2p::{
     identity,
     mdns::{Mdns, MdnsConfig},
     swarm::SwarmEvent,
     PeerId, Swarm,
 };
-use std::arch::x86_64::_SIDD_MOST_SIGNIFICANT;
 use std::cmp::{Eq, Ord, Reverse};
 use std::collections::{BinaryHeap, HashMap};
 use std::error::Error;
@@ -79,18 +82,42 @@ pub async fn into_protocol(
             reciever,
             accounts,
             friends,
+            mempool: transactions::MemPool::default(),
             last_block,
             boot_helper: BootHelper {
                 temp_last: "".to_string(),
                 old_last: "".to_string(),
                 friends_last: Vec::new(),
+                friends_last_block: Vec::new(),
+                friends_accnts: Vec::new(),
             },
             node_type: NodeType::FullNode,
         };
         Swarm::new(transport, behaviour, local_peer_id)
     };
-    swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
-    swarm.listen_on("/ip6/::0/tcp/0".parse()?)?;
+    match db::get("addrs".to_string()) {
+        Ok(None) => {
+            swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+            swarm.listen_on("/ip6/::0/tcp/0".parse()?)?;
+            let mut my_addrs: Vec<Multiaddr> = Vec::new();
+            for multi in swarm.listeners() {
+                my_addrs.push(multi.clone());
+            }
+            db::put(
+                db::serialize(&my_addrs).expect("Serialize error"),
+                "addrs".to_string(),
+            )
+            .expect("deserialize error");
+        }
+        Ok(Some(vc)) => {
+            if let Ok(my_addrs) = db::deserialize::<Vec<Multiaddr>>(&vc) {
+                for multi in my_addrs {
+                    swarm.listen_on(multi).expect("listen error");
+                }
+            }
+        }
+        _ => (),
+    }
     //swarm.listen_on("/ip4/192.168.1.197/tcp/54005".parse()?)?;
     swarm = zkademlia::boot(swarm);
     let behaviour = swarm.behaviour_mut();
@@ -111,21 +138,76 @@ pub async fn into_protocol(
     .unwrap();*/
 
     // Kick it off.
+    let behaviour = swarm.behaviour_mut();
     loop {
+        match behaviour.reciever.try_recv() {
+            Ok(request) => match request {
+                Request::AddFriend(peer) => {
+                    behaviour.friends.add_friend(peer);
+                    db::put(
+                        "friends".to_string(),
+                        db::serialize(&behaviour.friends).expect("serde error"),
+                    );
+                }
+                Request::RemoveFriend(peer) => {
+                    behaviour.friends.remove_friend(peer);
+                    db::put(
+                        "friends".to_string(),
+                        db::serialize(&behaviour.friends).expect("serde error"),
+                    );
+                }
+                Request::SendTransaction(pubk, ammount) => {
+                    if let identity::Keypair::Secp256k1(k) = local_key.clone() {
+                        if let Some(AccountInfo { value: _, nonce }) =
+                            behaviour.accounts.value.account(&local_peer_id)
+                        {
+                            behaviour
+                                .gossipsub
+                                .publish(
+                                    Topic::new("Transaction"),
+                                    db::serialize(&Transaction::new(
+                                        k,
+                                        pubk,
+                                        ammount,
+                                        nonce.clone(),
+                                    ))
+                                    .expect("serde Error")
+                                    .as_bytes(),
+                                )
+                                .expect("pub Error");
+                        }
+                    }
+                }
+                Request::CreateBlock() => {
+                    let block = Block::default();
+                    behaviour
+                        .gossipsub
+                        .publish(
+                            Topic::new("Block"),
+                            db::serialize(&block).expect("serde Error").as_bytes(),
+                        )
+                        .expect("pub Error");
+                    crate::networks::events::update_accounts(
+                        &mut behaviour.accounts,
+                        block.clone(),
+                    );
+                    behaviour.last_block = block.clone();
+                    behaviour.mempool.rm(&block.tx);
+                }
+            },
+            Err(_) => (),
+        }
+        /*
         select! {
-            line = stdin.select_next_some() => input::handle_input_line(&mut swarm.behaviour_mut(), line.expect("Stdin not to close"), topic.clone()),
-            event = swarm.select_next_some() => match event {
+            line = stdin.select_next_some() => input::handle_input_line(behaviour, line.expect("Stdin not to close"), topic.clone()),
+            event = behaviour.select_next_some() => match event {
                 SwarmEvent::NewListenAddr { address, .. } => {
                     println!("Listening in {:?}", address);
 
                 },
                 _ => {}
             }
-        }
-        swarm
-            .behaviour_mut()
-            .kademlia
-            .store_mut()
-            .retain(validate::validate);
+        }*/
+        behaviour.kademlia.store_mut().retain(validate::validate);
     }
 }

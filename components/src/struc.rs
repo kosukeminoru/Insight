@@ -1,10 +1,10 @@
 use crate::peers;
-use libp2p::PeerId;
+use libp2p::{identity::secp256k1::PublicKey, PeerId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 //use rand_seeder::{Seeder, SipHasher};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BountyList {
     pub list: HashMap<PeerId, u32>,
 }
@@ -23,7 +23,7 @@ impl BountyList {
         PeerId::random()
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OnlineList {
     pub list: HashMap<PeerId, bool>,
 }
@@ -55,7 +55,7 @@ impl AccountInfo {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ValueList {
     pub list: HashMap<PeerId, AccountInfo>,
 }
@@ -83,7 +83,7 @@ impl ValueList {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Accounts {
     pub bounty_list: BountyList,
     pub active: OnlineList,
@@ -104,7 +104,7 @@ impl Accounts {
         }
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FriendsList {
     list: Vec<PeerId>,
 }
@@ -121,10 +121,10 @@ impl FriendsList {
     pub fn list(&self) -> &Vec<PeerId> {
         &self.list
     }
-    pub fn add_friend(mut self, peer: PeerId) {
+    pub fn add_friend(&mut self, peer: PeerId) {
         self.list.push(peer);
     }
-    pub fn remove_friend(mut self, peer: PeerId) -> Option<PeerId> {
+    pub fn remove_friend(&mut self, peer: PeerId) -> Option<PeerId> {
         let peer_pos = self.list.iter().position(|&x| x == peer);
         match peer_pos {
             Some(pos) => {
@@ -135,29 +135,28 @@ impl FriendsList {
         }
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+
 pub enum Request {
     AddFriend(PeerId),
     RemoveFriend(PeerId),
+    SendTransaction(PublicKey, f32),
+    CreateBlock(),
 }
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NetworkInfo {
     accounts: Accounts,
-    bounty: PeerId,
     friends: FriendsList,
 }
 impl NetworkInfo {
-    pub fn new(a: Accounts, b: PeerId, f: FriendsList) -> NetworkInfo {
+    pub fn new(a: Accounts, f: FriendsList) -> NetworkInfo {
         NetworkInfo {
             accounts: a,
-            bounty: b,
             friends: f,
         }
     }
     pub fn default() -> NetworkInfo {
         NetworkInfo {
             accounts: Accounts::default(),
-            bounty: PeerId::from_bytes(&peers::P1ID).unwrap(),
             friends: FriendsList::default(),
         }
     }

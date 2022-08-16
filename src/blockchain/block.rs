@@ -1,5 +1,8 @@
+use crate::networks::validate;
+
 use super::transactions::{MemPool, Transaction};
 use components::struc;
+use components::struc::Accounts;
 use components::struc::ValueList;
 use libp2p::PeerId;
 use serde::{Deserialize, Serialize};
@@ -57,7 +60,26 @@ impl Block {
             mem,
         )
     }
-    pub fn validate(&self) {}
+    pub fn validate(&self) -> bool {
+        true
+    }
+    pub fn validate_work(&self) -> bool {
+        true
+    }
+    pub fn validate_tx(&self, v: &ValueList) -> bool {
+        for t in &self.tx {
+            if !(t.verify_transaction_sig() && t.verify_value(v)) {
+                return false;
+            }
+        }
+        true
+    }
+    pub fn validate_new(&self, value: &ValueList) -> bool {
+        if self.validate_work() && self.validate_tx(value) {
+            return true;
+        }
+        false
+    }
 }
 pub fn last_block() -> Block {
     //let last: Block = serde_json::from_str(&db::get("last".to_string())).unwrap();
@@ -67,6 +89,15 @@ pub fn last_block() -> Block {
 pub fn block_hash(block: &Block) -> String {
     let mut hasher = Sha256::new();
     let serialized = serde_json::to_string(block).unwrap();
+    hasher.update(serialized);
+    let result: String = format!("{:X}", hasher.finalize());
+    println!("{:?}", result);
+    result
+}
+
+pub fn accounts_hash(accounts: &Accounts) -> String {
+    let mut hasher = Sha256::new();
+    let serialized = serde_json::to_string(accounts).unwrap();
     hasher.update(serialized);
     let result: String = format!("{:X}", hasher.finalize());
     println!("{:?}", result);

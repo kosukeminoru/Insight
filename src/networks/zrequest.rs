@@ -1,4 +1,6 @@
 use super::db::db;
+use crate::blockchain;
+use crate::components::struc;
 use async_std::io;
 use async_trait::async_trait;
 use futures::prelude::*;
@@ -7,14 +9,16 @@ use libp2p::request_response::{
     ProtocolSupport, RequestId, RequestResponse, RequestResponseCodec, RequestResponseEvent,
     RequestResponseMessage, ResponseChannel,
 };
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Clone)]
 pub struct RequestProtocol();
 #[derive(Clone)]
 pub struct BlockCodec();
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BlockRequest();
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BlockResponse(pub String);
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BlockResponse(pub struc::Accounts, pub blockchain::block::Block);
 
 impl ProtocolName for RequestProtocol {
     fn protocol_name(&self) -> &[u8] {
@@ -58,7 +62,7 @@ impl RequestResponseCodec for BlockCodec {
             return Err(io::ErrorKind::UnexpectedEof.into());
         }
 
-        Ok(BlockResponse(String::from_utf8(vec).unwrap()))
+        Ok(db::deserialize::<BlockResponse>(&vec).expect("error"))
     }
 
     async fn write_request<T>(
@@ -80,12 +84,18 @@ impl RequestResponseCodec for BlockCodec {
         &mut self,
         _: &RequestProtocol,
         io: &mut T,
-        BlockResponse(hash): BlockResponse,
+        BlockResponse(accounts, block): BlockResponse,
     ) -> io::Result<()>
     where
         T: AsyncWrite + Unpin + Send,
     {
-        write_length_prefixed(io, hash).await?;
+        write_length_prefixed(
+            io,
+            db::serialize(&BlockResponse(accounts, block))
+                .expect("Serialize Error")
+                .into_bytes(),
+        )
+        .await?;
         io.close().await?;
 
         Ok(())

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use serde_big_array::BigArray;
 use sha2::{Digest, Sha256};
 use std::collections::VecDeque;
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Transaction {
     pub data: TxData,
     pub signature: Vec<u8>,
@@ -49,7 +49,7 @@ impl Transaction {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct TxData {
     #[serde(with = "BigArray")]
     pub sender: [u8; 33],
@@ -77,13 +77,30 @@ impl TxData {
 }
 
 pub struct MemPool {
-    txs: VecDeque<Transaction>,
+    txs: Vec<Transaction>,
 }
 impl MemPool {
+    pub fn default() -> MemPool {
+        MemPool {
+            txs: Vec::<Transaction>::new(),
+        }
+    }
     pub fn push(&mut self, tx: Transaction) {
-        self.txs.push_back(tx);
+        self.txs.push(tx);
     }
     pub fn pop(&mut self) -> Option<Transaction> {
-        self.txs.pop_front()
+        self.txs.pop()
     }
+    pub fn rm(&mut self, tx: &Vec<Transaction>) {
+        self.txs.retain(|x| contains(x, tx));
+    }
+}
+
+pub fn contains(x: &Transaction, tx: &Vec<Transaction>) -> bool {
+    for t in tx {
+        if x == t {
+            return false;
+        }
+    }
+    true
 }

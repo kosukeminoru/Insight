@@ -52,5 +52,5 @@ pub fn val_window_conf() -> WindowDescriptor {
 //Graphics
 pub fn setup_graphics(mut commands: Commands) {
     // Add a camera so we can see
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(Camera2dBundle::default());
 }

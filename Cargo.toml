@@ -9,8 +9,8 @@ edition = "2021"
 void = "1.0.2"
 crossbeam-channel = "0.5.6"
 components = {path = "components"}
-bevy = "0.7.0"
-bevy_rapier2d = { version = "0.15.0", features = [ "enhanced-determinism" ]}
+bevy = "0.8.0"
+bevy_rapier2d = { version = "0.16.1", features = [ "enhanced-determinism" ]}
 rand = { version = "0.8.5", features = ["small_rng"] }
 rand_pcg = "0.3.1"
 rand_seeder = "0.2.3"
@@ -31,8 +31,8 @@ log = "0.4.14"
 pin-project = "1.0.10"
 streamunordered = "0.5.2"
 thiserror = "1.0.30"
-bevy_transform_gizmo = {path = "components/crates/bevy_transform_gizmo-0.2-2.1"}
-bevy_mod_picking = "0.7.0"
-bevy_mod_raycast = "0.5.0"
+#bevy_transform_gizmo = {path = "components/crates/bevy_transform_gizmo-0.2-2.1"}
+bevy_mod_picking = "0.8.2"
+bevy_mod_raycast = "0.6.2"
 rocksdb = "0.18.0"
 serde-big-array = "0.4.1"

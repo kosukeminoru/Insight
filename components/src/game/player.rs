@@ -51,11 +51,11 @@ pub fn player(
     //Proceed is to ensure no objects are moving
     let mut proceed: bool = true;
     //Iterates through velocities if moving, proceed = false
-    for vel in velocity.iter() {
+    /*  for vel in velocity.iter() {
         if super::collisions::moving(vel) == true {
             proceed = false;
         }
-    }
+    }*/
     if proceed {
         match number.shot {
             6 => exit.send(AppExit),
@@ -80,8 +80,8 @@ pub fn player(
                     first: resource.first,
                     second: resource.second,
                 };
-                shoot_player(&mut commands, &shot);
-                //store shot in db
+                shoot_player(&mut commands); //, &shot);
+                                             //store shot in db
                 match number.shot {
                     1 => attempt.first = Some(shot),
                     2 => attempt.second = Some(shot),
@@ -98,19 +98,20 @@ pub fn player(
     }
 }
 
-pub fn shoot_player(commands: &mut Commands, resource: &MouseResource) {
+pub fn shoot_player(commands: &mut Commands) {
+    //resource: &MouseResource) {
     //Calculate distance between two points
     println!("enter4");
-    let x = resource.second.to_array()[0] - WX / 2.0;
-    let y = resource.second.to_array()[1] - WY / 2.0;
-    let mut distx = resource.first.to_array()[0] - resource.second[0];
-    let mut disty = resource.first.to_array()[1] - resource.second[1];
+    //let x = resource.second.to_array()[0] - WX / 2.0;
+    //let y = resource.second.to_array()[1] - WY / 2.0;
+    //let mut distx = resource.first.to_array()[0] - resource.second[0];
+    //let mut disty = resource.first.to_array()[1] - resource.second[1];
     //if one of the distances is greater than 350.0 then it is 0. (change later)
-    let max = distx.abs().max(disty.abs());
-    if max > 350.0 {
-        distx = 0.0;
-        disty = 0.0;
-    }
+    //let max = distx.abs().max(disty.abs());
+    //if max > 350.0 {
+    //    distx = 0.0;
+    //   disty = 0.0;
+    //}
     //Create a player object with the parameters (Change later)
     commands
         .spawn()
@@ -129,11 +130,12 @@ pub fn shoot_player(commands: &mut Commands, resource: &MouseResource) {
         .insert(Collider::cuboid(10.0, 10.0))
         .insert(ActiveEvents::COLLISION_EVENTS)
         .insert(Velocity {
-            linvel: Vec2::new(distx, disty),
+            linvel: Vec2::new(0.0, 0.0),
             angvel: 0.0,
         })
         .insert(Restitution::coefficient(0.7))
-        .insert_bundle(TransformBundle::from(Transform::from_xyz(x, y, 0.0)));
+        //.insert_bundle(TransformBundle::from(Transform::from_xyz(x, y, 0.0)));
+        .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)));
 }
 
 // stores Mouse Resource (Change later needs key value )

@@ -51,6 +51,7 @@ pub async fn into_protocol(
     local_peer_id: PeerId,
     sender: Sender<NetworkInfo>,
     reciever: Receiver<Request>,
+    remote_send: Sender<NetworkEvent>,
 ) -> Result<(), Box<dyn Error>> {
     let last_block: Block = db::try_get_last_block();
     let friends: FriendsList = db::try_get_friends();
@@ -79,6 +80,7 @@ pub async fn into_protocol(
             mdns,
             request,
             sender,
+            remote_send,
             reciever,
             accounts,
             friends,
@@ -193,6 +195,15 @@ pub async fn into_protocol(
                     );
                     behaviour.last_block = block.clone();
                     behaviour.mempool.rm(&block.tx);
+                }
+                Request::NetworkEvent(e) => {
+                    behaviour
+                        .gossipsub
+                        .publish(
+                            Topic::new("move"),
+                            db::serialize(&e).expect("serde Error").as_bytes(),
+                        )
+                        .expect("pub Error");
                 }
             },
             Err(_) => (),

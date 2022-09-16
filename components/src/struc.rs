@@ -1,4 +1,6 @@
 use crate::peers;
+use bevy::ecs::reflect::ReflectComponent;
+use bevy::{ecs::reflect, prelude::Component, reflect::Reflect};
 use libp2p::{identity::secp256k1::PublicKey, PeerId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -139,6 +141,7 @@ impl FriendsList {
 pub enum Request {
     AddFriend(PeerId),
     RemoveFriend(PeerId),
+    NetworkEvent(NetworkEvent),
     SendTransaction(PublicKey, f32),
     CreateBlock(),
 }
@@ -158,6 +161,32 @@ impl NetworkInfo {
         NetworkInfo {
             accounts: Accounts::default(),
             friends: FriendsList::default(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct NetworkEvent {
+    pub player: PeerId,
+    pub input: PlayerInput,
+}
+#[derive(Serialize, Deserialize, Debug, Component)]
+pub struct LocalPlayer;
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PlayerInput {
+    pub key: u8,
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Component)]
+pub struct PlayerID {
+    pub id: PeerId,
+}
+impl Default for PlayerID {
+    fn default() -> Self {
+        PlayerID {
+            id: PeerId::random(),
         }
     }
 }

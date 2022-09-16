@@ -62,7 +62,7 @@ pub struct BootHelper {
     pub friends_last_block: Vec<Block>,
     pub friends_accnts: Vec<Accounts>,
 }
-//custom out event
+//custom out event 
 //two kademlias
 #[derive(NetworkBehaviour)]
 #[behaviour(event_process = true)]
@@ -76,6 +76,8 @@ pub struct MyBehaviour {
     pub sender: Sender<NetworkInfo>,
     #[behaviour(ignore)]
     pub reciever: Receiver<Request>,
+    #[behaviour(ignore)]
+    pub remote_send: Sender<NetworkEvent>,
     #[behaviour(ignore)]
     pub accounts: Accounts,
     #[behaviour(ignore)]
@@ -248,6 +250,7 @@ impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
         {
             let b = Topic::new("Block").hash().into_string();
             let t = Topic::new("Transaction").hash().into_string();
+            let m = Topic::new("move").hash().into_string();
             if message.topic.as_str() == &b {
                 let block = db::deserialize::<Block>(&message.data).expect("Error deserializing");
                 if block.validate_new(&self.accounts.value) {
@@ -272,6 +275,10 @@ impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
                 if tx.verify_transaction_sig() {
                     self.mempool.push(tx);
                 }
+            } else if message.topic.as_str() == &m {
+                let movement =
+                    db::deserialize::<NetworkEvent>(&message.data).expect("Error deserializing");
+                self.remote_send.send(movement);
             }
 
             //When recieved

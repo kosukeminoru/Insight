@@ -2,15 +2,15 @@ use crate::struc::NetworkEvent;
 use crate::struc::NetworkInfo;
 use crate::struc::PlayerID;
 use crate::struc::Request;
-use crate::subapps;
+//use crate::subapps;
 use bevy::app::App;
 //use bevy::app::AppLabel;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use crossbeam_channel::Receiver;
 use crossbeam_channel::Sender;
-use subapps::renderer::camera::pan_orbit;
-use subapps::renderer::geometry::my_plane;
+//use subapps::renderer::camera::pan_orbit;
+//use subapps::renderer::geometry::my_plane;
 
 pub fn run(
     reciever: Receiver<NetworkInfo>,
@@ -36,15 +36,72 @@ pub fn run(
     app.add_plugins_with(DefaultPlugins, |group| {
         group.disable::<bevy::log::LogPlugin>()
     });
-    app.add_plugin(MyApp);
+    // app.add_plugin(MyApp);
     app.insert_resource(reciever);
     app.insert_resource(sender);
     app.add_system(update_accounts);
-    app.add_system(network_events);
+    //app.add_system(network_events);
 
     app.run();
 }
 
+fn update_accounts(mut commands: Commands, r: Res<Receiver<NetworkInfo>>) {
+    if let Result::Ok(accounts) = r.try_recv() {
+        commands.insert_resource(accounts);
+    }
+}
+fn network_events(
+    mut commands: Commands,
+    r: Res<Receiver<NetworkEvent>>,
+    query: Query<(Entity, &PlayerID, &mut Transform)>,
+) {
+    let v: Vec<NetworkEvent> = r.iter().collect();
+    for m in v.iter() {
+        let mut ent;
+        let mut trans;
+        for (a, b, t) in query.iter() {
+            if b.id == m.player {
+                ent = a;
+                trans = t;
+                break;
+            }
+        }
+        match m.input.key {
+            /*
+            1 => {
+                commands
+                    .spawn()
+                    .insert(RigidBody::Dynamic)
+                    .insert(Collider::ball(5.0))
+                    .insert(PlayerID { id: m.player })
+                    .insert_bundle(SpriteBundle {
+                        sprite: Sprite {
+                            color: Color::rgb(1.0, 0.25, 0.75),
+                            custom_size: Some(Vec2::new(5.0 * 2.0, 5.0 * 2.0)),
+                            ..default()
+                        },
+                        transform: Transform {
+                            ..Default::default()
+                        },
+                        ..default()
+                    })
+                    .insert(ActiveEvents::COLLISION_EVENTS)
+                    .insert(Restitution::coefficient(0.5))
+                    .insert(Velocity { ..default() })
+                    .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)));
+            }
+            2 => {
+                commands.entity(ent).despawn();
+            }
+            3 => trans.translation[0] += 1.0,
+            4 => trans.translation[0] -= 1.0,
+            5 => trans.translation[1] += 1.0,
+            6 => trans.translation[1] -= 1.0,*/
+            _ => (),
+        }
+    }
+}
+/*
 pub struct MyApp;
 impl Plugin for MyApp {
     fn build(&self, app: &mut App) {
@@ -91,61 +148,7 @@ fn add(mut commands: Commands) {
     }
 }*/
 
-fn update_accounts(mut commands: Commands, r: Res<Receiver<NetworkInfo>>) {
-    if let Result::Ok(accounts) = r.try_recv() {
-        commands.insert_resource(accounts);
-    }
-}
-fn network_events(
-    mut commands: Commands,
-    r: Res<Receiver<NetworkEvent>>,
-    query: Query<(Entity, &PlayerID, &mut Transform)>,
-) {
-    let v: Vec<NetworkEvent> = r.iter().collect();
-    for m in v.iter() {
-        let mut ent;
-        let mut trans;
-        for (a, b, t) in query.iter() {
-            if b.id == m.player {
-                ent = a;
-                trans = t;
-                break;
-            }
-        }
-        match m.input.key {
-            1 => {
-                commands
-                    .spawn()
-                    .insert(RigidBody::Dynamic)
-                    .insert(Collider::ball(5.0))
-                    .insert(PlayerID { id: m.player })
-                    .insert_bundle(SpriteBundle {
-                        sprite: Sprite {
-                            color: Color::rgb(1.0, 0.25, 0.75),
-                            custom_size: Some(Vec2::new(5.0 * 2.0, 5.0 * 2.0)),
-                            ..default()
-                        },
-                        transform: Transform {
-                            ..Default::default()
-                        },
-                        ..default()
-                    })
-                    .insert(ActiveEvents::COLLISION_EVENTS)
-                    .insert(Restitution::coefficient(0.5))
-                    .insert(Velocity { ..default() })
-                    .insert_bundle(TransformBundle::from(Transform::from_xyz(0.0, 0.0, 0.0)));
-            }
-            2 => {
-                commands.entity(ent).despawn();
-            }
-            3 => trans.translation[0] += 1.0,
-            4 => trans.translation[0] -= 1.0,
-            5 => trans.translation[1] += 1.0,
-            6 => trans.translation[1] -= 1.0,
-            _ => (),
-        }
-    }
-}
+
 fn movement(
     mut commands: Commands,
     s: Res<Sender<NetworkEvent>>,
@@ -193,3 +196,4 @@ app.add_plugins_with(DefaultPlugins, |group| {
         .disable::<bevy::winit::WinitPlugin>()
         .disable::<bevy::core::CorePlugin>()
 })*/
+*/

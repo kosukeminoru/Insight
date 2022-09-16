@@ -12,13 +12,21 @@ use components::struc::Request;
 use futures::executor::block_on;
 use libp2p::{identity, PeerId};
 
+/*
+The code is separated into two parts. Components and Src. Both use the SAME local files downloaded by cargo.toml (share a target space)
+Components contains a file called stuc and peers. Struc contains the useful structs and peers are 3 hard coded peers with private keys.
+ */
 fn main() {
     env_logger::init();
+    //Using peer 1
     let private: identity::Keypair =
         identity::Keypair::from_protobuf_encoding(&peers::P1KEY).expect("Decoding Error");
     let peerid: PeerId = PeerId::from(private.public());
+    //NetworkInfo (Friends list and accounts)
     let (s, r) = bounded::<NetworkInfo>(1);
+    //GameEvents
     let (game_send, net_recieve) = unbounded::<Request>();
+    //supposed to be for player movement
     let (net_send, game_recieve) = unbounded::<NetworkEvent>();
     let my_future = networks::protocol::into_protocol(private, peerid, s, net_recieve, net_send);
     thread::spawn(move || block_on(my_future).expect("Thread Spawn Error"));

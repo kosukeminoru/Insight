@@ -18,6 +18,7 @@ use async_trait::async_trait;
 use components::struc::AccountInfo;
 use components::struc::Accounts;
 use components::struc::FriendsList;
+use components::struc::NetworkEvent;
 use components::struc::NetworkInfo;
 use components::struc::Request;
 use crossbeam_channel::Receiver;
@@ -57,7 +58,7 @@ pub async fn into_protocol(
     let friends: FriendsList = db::try_get_friends();
     let accounts: Accounts = db::try_get_accounts();
     println!("{:?}", local_peer_id);
-
+    //Initializing behaviors
     let mut swarm = {
         let transport = transport::build_transport(local_key.clone()).await?;
         let gossipsub: gossipsub::Gossipsub = zgossipsub::create_gossip(local_key.clone());
@@ -97,6 +98,10 @@ pub async fn into_protocol(
         };
         Swarm::new(transport, behaviour, local_peer_id)
     };
+    //I'm not sure if there is an easier way to connect to friends that have dynamic IPs.
+    //Thus each node will re-use their IPs. Probably a better way, but it's annoying
+
+    //If i know my exisiting IPs, listen on them, or else create new ones.
     match db::get("addrs".to_string()) {
         Ok(None) => {
             swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
@@ -124,6 +129,7 @@ pub async fn into_protocol(
     swarm = zkademlia::boot(swarm);
     let behaviour = swarm.behaviour_mut();
     for friends in behaviour.friends.list() {
+        //Will either emit and error or the response.
         behaviour.request.send_request(friends, BlockRequest());
     }
 
@@ -141,6 +147,7 @@ pub async fn into_protocol(
 
     // Kick it off.
     let behaviour = swarm.behaviour_mut();
+    //This is the loop i was talking about for game events.
     loop {
         match behaviour.reciever.try_recv() {
             Ok(request) => match request {
@@ -219,6 +226,7 @@ pub async fn into_protocol(
                 _ => {}
             }
         }*/
+        //Only retains blocks of certain condition. Right now always returns true. Not important
         behaviour.kademlia.store_mut().retain(validate::validate);
     }
 }

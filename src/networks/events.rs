@@ -10,6 +10,7 @@ use crate::blockchain::transactions;
 use crate::blockchain::transactions::Transaction;
 use components::struc::Accounts;
 use components::struc::FriendsList;
+use components::struc::NetworkEvent;
 use components::struc::NetworkInfo;
 use components::struc::Request;
 use crossbeam_channel::Receiver;
@@ -37,7 +38,7 @@ use libp2p::{
     swarm::NetworkBehaviourEventProcess,
     NetworkBehaviour,
 };
-
+//helper function for adjusting accounts after recieving a valid block.
 pub fn update_accounts(a: &mut Accounts, b: Block) {
     for t in b.tx {
         let spubkey: PublicKey = PublicKey::decode(&t.data.sender).unwrap();
@@ -55,6 +56,7 @@ pub fn update_accounts(a: &mut Accounts, b: Block) {
             .nonce_increment(PeerId::from_public_key(&PubKey::Secp256k1(spubkey)));
     }
 }
+//this is put into the network behavior
 pub struct BootHelper {
     pub temp_last: String,
     pub old_last: String,
@@ -62,8 +64,9 @@ pub struct BootHelper {
     pub friends_last_block: Vec<Block>,
     pub friends_accnts: Vec<Accounts>,
 }
-//custom out event 
-//two kademlias
+//custom out event
+//two kademlias? - Ignore
+
 #[derive(NetworkBehaviour)]
 #[behaviour(event_process = true)]
 pub struct MyBehaviour {
@@ -135,13 +138,16 @@ pub enum NodeType {
     LightNode,
     Client,
 }
-
+//Events for each behavior in swarm.
 impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockResponse>>
     for MyBehaviour
 {
     fn inject_event(&mut self, event: RequestResponseEvent<BlockRequest, BlockResponse>) {
         match event {
             RequestResponseEvent::Message { peer: _, message } => match message {
+                //Request
+                // We can go through this. Pretty much the goal is to remember the most frequent block.
+                //It might be good the create your own algorithm for this. Keep in mind it is a bit funky.
                 RequestResponseMessage::Request {
                     request_id: _,
                     request: _,
@@ -154,12 +160,14 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
                         )
                         .expect("response error");
                 }
+                //response
                 RequestResponseMessage::Response {
                     request_id: _,
                     response,
                 } => {
                     let BlockResponse(accounts, block) = response;
                     if block.validate() {
+                        //If valid block,
                         self.boot_helper.friends_last.push(block_hash(&block));
                         self.boot_helper.friends_last_block.push(block);
                         self.boot_helper.friends_accnts.push(accounts);
@@ -199,6 +207,7 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
                                     Quorum::One,
                                 );
                             } else {
+                                //Ready to join the netowrk. Ording of this should change.
                                 let topic = Topic::new("Block");
                                 self.gossipsub.subscribe(&topic).expect("Correct topic");
                             }
@@ -206,6 +215,7 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
                     }
                 }
             },
+            //This needs to be recorded so the protocol knows when to stop (responses from everyone)
             RequestResponseEvent::OutboundFailure {
                 peer: _,
                 request_id: _,
@@ -248,6 +258,8 @@ impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
             message,
         } = event
         {
+            //topics not important right now.
+            //different events for different topics
             let b = Topic::new("Block").hash().into_string();
             let t = Topic::new("Transaction").hash().into_string();
             let m = Topic::new("move").hash().into_string();
@@ -372,6 +384,7 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
                                         }
                                         _ => (),
                                     }
+                                    //Final condition + If this is true, node is updated.
                                     if recieved_block.prev_blockhash != self.boot_helper.old_last {
                                         self.boot_helper.temp_last =
                                             recieved_block.prev_blockhash.clone();
@@ -379,7 +392,9 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
                                             Key::new(&recieved_block.prev_blockhash),
                                             Quorum::One,
                                         );
-                                    } else {
+                                    }
+                                    //Try again, make sure your last block is same as friend's
+                                    else {
                                         for friends in self.friends.list() {
                                             self.request.send_request(friends, BlockRequest());
                                         }

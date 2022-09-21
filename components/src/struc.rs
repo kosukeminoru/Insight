@@ -143,7 +143,7 @@ pub enum Request {
     RemoveFriend(PeerId),
     NetworkEvent(NetworkEvent),
     SendTransaction(PublicKey, f32),
-    CreateBlock(),
+    CreateBlock(Vec<HashMap>, bevy::World),
 }
 #[derive(Serialize, Deserialize, Debug)]
 pub struct NetworkInfo {
@@ -172,7 +172,6 @@ pub struct NetworkEvent {
 }
 #[derive(Serialize, Deserialize, Debug, Component)]
 pub struct LocalPlayer;
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PlayerInput {

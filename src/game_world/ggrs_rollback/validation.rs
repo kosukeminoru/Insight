@@ -24,22 +24,18 @@ const ROLLBACK_DEFAULT: &str = "rollback_default";
 const ROLLBACK_DEFAULT2: &str = "rollback_default2";
 // cargo run -- --local-port 7000 --players localhost 127.0.0.1:7001
 // cargo run -- --local-port 7001 --players 127.0.0.1:7000 localhost
-pub fn run(
-    r: Receiver<NetworkInfo>,
-    game_recieve: Receiver<NetworkEvent>,
-    game_s: Sender<Request>,
-) {
+pub fn run(vec: Vec<HashMap>, w: bevy::World) -> bool {
     // Create a GGRS session.
-    let sess_build = network::create_ggrs_session().unwrap();
 
-    // Start the GGRS session.
+    let mut app = App::from_world(w);
+    app.insert_resource(WinitSettings {
+        return_from_run: true,
+        focused_mode: UpdateMode::Continuous,
+        unfocused_mode: UpdateMode::Continuous,
+    });
     let sess = network::start_ggrs_session(sess_build).unwrap();
 
-    let mut app = App::new();
-    app.insert_resource(r);
-    app.insert_resource(game_recieve);
-    app.insert_resource(game_s);
-
+    app.insert_resource(Vec);
     // GGRS Configuration
     GGRSPlugin::<network::GGRSConfig>::new()
         // Define frequency of rollback game logic update.
@@ -65,9 +61,6 @@ pub fn run(
         .build(&mut app);
 
     // GGRS Setup
-    app // Add your GGRS session.
-        .insert_resource(sess)
-        .insert_resource(SessionType::P2PSession);
 
     //General Setup
     app.insert_resource(Msaa { samples: 4 })
@@ -87,6 +80,7 @@ pub fn run(
         .add_plugin(RapierDebugRenderPlugin::default());
 
     // Camera
+
     app.add_startup_system(ggrs_camera::setup_camera)
         .add_system(ggrs_camera::update_camera);
 
@@ -110,6 +104,6 @@ pub fn run(
     app.run();
 }
 
-pub fn screenshot(world: &mut World) {
+pub fn screenshot() {
     world.insert_resource(world);
 }

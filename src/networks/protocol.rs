@@ -135,6 +135,7 @@ pub async fn into_protocol(
             behaviour.request.send_request(friends, BlockRequest());
         }
     */
+
     let topic = Topic::new("Block");
 
     // Read full lines from stdin
@@ -151,9 +152,10 @@ pub async fn into_protocol(
     let behaviour = swarm.behaviour_mut();
     //This is the loop i was talking about for game events.
     loop {
-        behaviour
-            .gossipsub
-            .publish(topic, blockchain::block::Block::default());
+        behaviour.gossipsub.publish(
+            topic.clone(),
+            db::serialize(&blockchain::block::Block::default()).expect("serde"),
+        );
         match behaviour.reciever.try_recv() {
             Ok(request) => match request {
                 Request::AddFriend(peer) => {

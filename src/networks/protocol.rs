@@ -150,6 +150,10 @@ pub async fn into_protocol(
 
     // Kick it off.
     let behaviour = swarm.behaviour_mut();
+    behaviour
+        .gossipsub
+        .subscribe(&topic.clone())
+        .expect("Correct topic");
     //This is the loop i was talking about for game events.
     loop {
         behaviour.gossipsub.publish(

@@ -309,6 +309,9 @@ impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
 impl NetworkBehaviourEventProcess<MdnsEvent> for MyBehaviour {
     // Called when `mdns` produces an event.
     fn inject_event(&mut self, event: MdnsEvent) {
+        println!("{:?}", event);
+        let topic = Topic::new("Block");
+
         if let MdnsEvent::Discovered(list) = event {
             for (peer_id, multiaddr) in list {
                 self.kademlia.add_address(&peer_id, multiaddr);

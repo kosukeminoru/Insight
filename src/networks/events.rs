@@ -252,6 +252,7 @@ impl NetworkBehaviourEventProcess<RequestResponseEvent<BlockRequest, BlockRespon
 impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
     // Called when `gossipsub` produces an event.
     fn inject_event(&mut self, event: GossipsubEvent) {
+        println!("{:?}", event);
         if let gossipsub::GossipsubEvent::Message {
             propagation_source: peer_id,
             message_id: id,

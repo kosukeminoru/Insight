@@ -24,15 +24,15 @@ fn main() {
     let private: identity::Keypair =
         identity::Keypair::from_protobuf_encoding(&peers::P1KEY).expect("Decoding Error");
     let peerid: PeerId = PeerId::from(private.public());
-    simulation::run();
+    //simulation::run();
     //NetworkInfo (Friends list and accounts)
-    // let (s, r) = bounded::<NetworkInfo>(1);
+    let (s, r) = bounded::<NetworkInfo>(1);
     // //GameEvents
-    // let (game_send, net_recieve) = unbounded::<Request>();
+    let (game_send, net_recieve) = unbounded::<Request>();
     // //supposed to be for player movement
-    // let (net_send, game_recieve) = unbounded::<NetworkEvent>();
-    // let my_future = networks::protocol::into_protocol(private, peerid, s, net_recieve, net_send);
-    // thread::spawn(move || block_on(my_future).expect("Thread Spawn Error"));
+    let (net_send, game_recieve) = unbounded::<NetworkEvent>();
+    let my_future = networks::protocol::into_protocol(private, peerid, s, net_recieve, net_send);
+    thread::spawn(move || block_on(my_future).expect("Thread Spawn Error"));
     // components::game::simulation::run(r, game_send, game_recieve);
 }
 

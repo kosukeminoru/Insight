@@ -1,4 +1,5 @@
 use super::db::db;
+use crate::blockchain;
 use crate::blockchain::block::block_hash;
 use crate::blockchain::block::Block;
 use crate::blockchain::transactions;
@@ -128,11 +129,12 @@ pub async fn into_protocol(
     //swarm.listen_on("/ip4/192.168.1.197/tcp/54005".parse()?)?;
     swarm = zkademlia::boot(swarm);
     let behaviour = swarm.behaviour_mut();
-    for friends in behaviour.friends.list() {
-        //Will either emit and error or the response.
-        behaviour.request.send_request(friends, BlockRequest());
-    }
-
+    /*
+        for friends in behaviour.friends.list() {
+            //Will either emit and error or the response.
+            behaviour.request.send_request(friends, BlockRequest());
+        }
+    */
     let topic = Topic::new("Block");
 
     // Read full lines from stdin
@@ -149,6 +151,9 @@ pub async fn into_protocol(
     let behaviour = swarm.behaviour_mut();
     //This is the loop i was talking about for game events.
     loop {
+        behaviour
+            .gossipsub
+            .publish(topic, blockchain::block::Block::default());
         match behaviour.reciever.try_recv() {
             Ok(request) => match request {
                 Request::AddFriend(peer) => {

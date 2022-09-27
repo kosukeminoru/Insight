@@ -265,6 +265,8 @@ impl NetworkBehaviourEventProcess<GossipsubEvent> for MyBehaviour {
             let m = Topic::new("move").hash().into_string();
             if message.topic.as_str() == &b {
                 let block = db::deserialize::<Block>(&message.data).expect("Error deserializing");
+                println!("enter");
+                println!("{:?}", block);
                 if block.validate_new(&self.accounts.value) {
                     db::put(
                         block_hash(&block),

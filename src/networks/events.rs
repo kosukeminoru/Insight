@@ -473,6 +473,7 @@ impl NetworkBehaviourEventProcess<KademliaEvent> for MyBehaviour {
 }
 impl NetworkBehaviourEventProcess<IdentifyEvent> for MyBehaviour {
     fn inject_event(&mut self, message: IdentifyEvent) {
+        println!("{:?}", message);
         if let IdentifyEvent::Received {
             peer_id,
             info:

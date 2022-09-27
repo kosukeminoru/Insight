@@ -22,9 +22,10 @@ fn main() {
     //env_logger::init();
     //Using peer 1
     /*
-    let private: identity::Keypair =
+    let priva: identity::Keypair =
         identity::Keypair::from_protobuf_encoding(&peers::P1KEY).expect("Decoding Error");
-    let peerid: PeerId = PeerId::from(private.public());*/
+    let peerid: PeerId = PeerId::from(priva.public());*/
+
     let priva: identity::Keypair = identity::Keypair::generate_ed25519();
     let peerid: PeerId = PeerId::from(priva.public());
     //simulation::run();

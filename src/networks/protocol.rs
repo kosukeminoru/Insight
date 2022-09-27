@@ -120,6 +120,7 @@ pub async fn into_protocol(
         Ok(Some(vc)) => {
             if let Ok(my_addrs) = db::deserialize::<Vec<Multiaddr>>(&vc) {
                 for multi in my_addrs {
+                    println!("{:?}", multi);
                     swarm.listen_on(multi).expect("listen error");
                 }
             }
